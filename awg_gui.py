@@ -16,14 +16,18 @@ except:
 import numpy as np
 import matplotlib.pyplot as plt
 
+import Waveform_PresetAmp as Wav
+
+
 class Window:
     def __init__(self):
         #initializing the variables
         #default values
         #also change the set_active values to make change in GUI if changing the default values
         self.num_seg = 3
-        self.time_units = "ms"
+        self.time_units = "us"
         self.amp_units = "mV"
+        self.AWG_clock = 1e8
         
         #gui initialization from the glade file
         self.gladefile = "awg_gui.glade"
@@ -38,12 +42,16 @@ class Window:
 
         self.builder.connect_signals(self)
         
+        #create a waveform object
+        self.wav_obj = Wav.Waveform(waveform_name = 'WAV1', AWG_clock = self.AWG_clock, TimeUnits = self.time_units , AmpUnits = self.amp_units)
+  
+
 
         #treeview model
         self.treeview_list = gtk.ListStore(str,str,str,str,str,str,str,str,str,str,str,str,str,str)
         self.treeview.set_model(self.treeview_list)
         #note that this has only 13 columns, the first column since depends on the segment number has to inserted at the first position manually
-        self.default_treeview_list = [0,0,0,0,0,0,0,0,0,0,0,0,0]
+        self.default_treeview_list = [100,0,0,0,0,0,0,0,0,0,0,0,0]
         for i in range(self.num_seg):
             self.treeview_list.append([i+1] + self.default_treeview_list)
         
@@ -176,7 +184,7 @@ class Window:
         self.cell = gtk.CellRendererText()
         self.time_units_box.pack_start(self.cell,True)
         self.time_units_box.add_attribute(self.cell, 'text', 1)
-        self.time_units_box.set_active(1)
+        self.time_units_box.set_active(2)
         self.amp_units_box.pack_start(self.cell,True)
         self.amp_units_box.add_attribute(self.cell, 'text', 1)
         self.amp_units_box.set_active(1)
@@ -196,7 +204,6 @@ class Window:
         self.treeview_list.clear()
         for i in range(self.num_seg):
             self.treeview_list.append([i+1] + self.default_treeview_list)
-        
 
     def on_time_units_box_changed(self,widget,data=None):
         self.index = widget.get_active()
@@ -204,6 +211,7 @@ class Window:
         self.time_units = self.model[self.index][1]
         print "Time units set to",self.time_units
         self.statusbar.push(self.context_id, "No. of Segments: " + str(self.num_seg) + " | Time Units: " + str(self.time_units) +  " | Amplitude Units: " + str(self.amp_units)) 
+        self.wav_obj.TimeUnits = self.time_units
 
     def on_amp_units_box_changed(self,widget,data=None):
         self.index = widget.get_active()
@@ -211,9 +219,76 @@ class Window:
         self.amp_units = self.model[self.index][1]
         print "Amplitide units units set to",self.amp_units
         self.statusbar.push(self.context_id, "No. of Segments: " + str(self.num_seg) + " | Time Units: " + str(self.time_units) +  " | Amplitude Units: " + str(self.amp_units)) 
+        self.wav_obj.AmpUnits = self.amp_units
     
     def text_edited(self,widget,path,text,index):
         self.treeview_list[path][index] = text
+        if 2 <=index <= 4:
+            seg_list_a = []
+            seg_list_m1 = []
+            seg_list_m2 = []
+            for i in range(self.num_seg):
+                seg_list_a += [[float(self.treeview_list[i][1]),float(self.treeview_list[i][2])]]
+                seg_list_m1 += [float(self.treeview_list[i][3])]
+                seg_list_m2 += [float(self.treeview_list[i][4])]
+
+            self.wav_obj.setValuesCH1(*seg_list_a)
+            self.wav_obj.setMarkersCH1(seg_list_m1,seg_list_m2)
+
+        elif 5 <=index <= 7:
+            seg_list_a = []
+            seg_list_m1 = []
+            seg_list_m2 = []
+            for i in range(self.num_seg):
+                seg_list_a += [[float(self.treeview_list[i][1]),float(self.treeview_list[i][5])]]
+                seg_list_m1 += [float(self.treeview_list[i][6])]
+                seg_list_m2 += [float(self.treeview_list[i][7])]
+
+            self.wav_obj.setValuesCH2(*seg_list_a)
+            self.wav_obj.setMarkersCH2(seg_list_m1,seg_list_m2)
+        elif 8 <=index <= 10:
+            seg_list_a = []
+            seg_list_m1 = []
+            seg_list_m2 = []
+            for i in range(self.num_seg):
+                seg_list_a += [[float(self.treeview_list[i][1]),float(self.treeview_list[i][8])]]
+                seg_list_m1 += [float(self.treeview_list[i][9])]
+                seg_list_m2 += [float(self.treeview_list[i][10])]
+
+            self.wav_obj.setValuesCH3(*seg_list_a)
+            self.wav_obj.setMarkersCH3(seg_list_m1,seg_list_m2)
+        elif 11 <=index <= 13:
+            seg_list_a = []
+            seg_list_m1 = []
+            seg_list_m2 = []
+            for i in range(self.num_seg):
+                seg_list_a += [[float(self.treeview_list[i][1]),float(self.treeview_list[i][11])]]
+                seg_list_m1 += [float(self.treeview_list[i][12])]
+                seg_list_m2 += [float(self.treeview_list[i][13])]
+
+            self.wav_obj.setValuesCH4(*seg_list_a)
+            self.wav_obj.setMarkersCH4(seg_list_m1,seg_list_m2)
+        #user only changes the time
+        else:
+            seg_list_a = []
+            #channel 1
+            for i in range(self.num_seg):
+                seg_list_a += [[float(self.treeview_list[i][1]),float(self.treeview_list[i][2])]]
+            self.wav_obj.setValuesCH1(*seg_list_a)
+            #channel 2
+            for i in range(self.num_seg):
+                seg_list_a += [[float(self.treeview_list[i][1]),float(self.treeview_list[i][5])]]
+            self.wav_obj.setValuesCH2(*seg_list_a)
+            #channel 3
+            for i in range(self.num_seg):
+                seg_list_a += [[float(self.treeview_list[i][1]),float(self.treeview_list[i][8])]]
+            self.wav_obj.setValuesCH3(*seg_list_a)
+            #channel 4
+            for i in range(self.num_seg):
+                seg_list_a += [[float(self.treeview_list[i][1]),float(self.treeview_list[i][11])]]
+            self.wav_obj.setValuesCH4(*seg_list_a)
+
+
 
     def on_plot1_clicked(self,widget,data=None):
         points_list_a = [(0,float(self.treeview_list[0][2]))]
@@ -244,9 +319,9 @@ class Window:
         axarr[0].set_ylabel("Amplitide[" + self.amp_units + "]")
         axarr[1].plot(*zip(*points_list_m1),color='r',linewidth=1.0,label="Marker 1")
         axarr[1].legend()
-        axarr[1].set_ylim([0,1.1])
+        axarr[1].set_ylim([-0.1,1.1])
         axarr[2].plot(*zip(*points_list_m2),color='r',linewidth=1.0,label="Marker 2")
-        axarr[2].set_ylim([0,1.1])
+        axarr[2].set_ylim([-0.1,1.1])
         axarr[2].legend()
         axarr[2].set_xlabel("Time[" + self.time_units + "]")
         plt.show()
@@ -279,9 +354,9 @@ class Window:
         axarr[0].set_ylabel("Amplitide[" + self.amp_units + "]")
         axarr[1].plot(*zip(*points_list_m1),color='g',linewidth=1.0,label="Marker 1")
         axarr[1].legend()
-        axarr[1].set_ylim([0,1.1])
+        axarr[1].set_ylim([-0.1,1.1])
         axarr[2].plot(*zip(*points_list_m2),color='g',linewidth=1.0,label="Marker 2")
-        axarr[2].set_ylim([0,1.1])
+        axarr[2].set_ylim([-0.1,1.1])
         axarr[2].legend()
         axarr[2].set_xlabel("Time[" + self.time_units + "]")
         plt.show()
@@ -314,9 +389,9 @@ class Window:
         axarr[0].set_ylabel("Amplitide[" + self.amp_units + "]")
         axarr[1].plot(*zip(*points_list_m1),color='b',linewidth=1.0,label="Marker 1")
         axarr[1].legend()
-        axarr[1].set_ylim([0,1.1])
+        axarr[1].set_ylim([-0.1,1.1])
         axarr[2].plot(*zip(*points_list_m2),color='b',linewidth=1.0,label="Marker 2")
-        axarr[2].set_ylim([0,1.1])
+        axarr[2].set_ylim([-0.1,1.1])
         axarr[2].legend()
         axarr[2].set_xlabel("Time[" + self.time_units + "]")
         plt.show()
@@ -349,9 +424,9 @@ class Window:
         axarr[0].set_ylabel("Amplitide[" + self.amp_units + "]")
         axarr[1].plot(*zip(*points_list_m1),color='c',linewidth=1.0,label="Marker 1")
         axarr[1].legend()
-        axarr[1].set_ylim([0,1.1])
+        axarr[1].set_ylim([-0.1,1.1])
         axarr[2].plot(*zip(*points_list_m2),color='c',linewidth=1.0,label="Marker 2")
-        axarr[2].set_ylim([0,1.1])
+        axarr[2].set_ylim([-0.1,1.1])
         axarr[2].legend()
         axarr[2].set_xlabel("Time[" + self.time_units + "]")
         plt.show()
