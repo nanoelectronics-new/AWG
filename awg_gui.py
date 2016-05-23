@@ -484,6 +484,7 @@ class Window:
         plt.show()
 
         self.wav_obj.CH4.rescaleAmplitude(self.AWGMax_amp)
+        
         AWG.send_waveform_object(Wav = self.wav_obj.CH4, path = 'C:\SEQwav\\')
         AWG.import_waveform_object(Wav = self.wav_obj.CH4, path = 'C:\SEQwav\\')
         AWG.import_waveform_object(Wav = self.wav_obj.CH4, path = 'C:\SEQwav\\')
