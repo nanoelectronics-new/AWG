@@ -17,6 +17,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 import Waveform_PresetAmp as Wav
+import qt
+
+if 'AWG' in locals():
+    AWG._ins._visainstrument.close()   # Trying to close previous AWG session. 
+
+       
+AWG = qt.instruments.create('AWG', 'Tektronix_AWG5014', address='169.254.111.236')
 
 
 class Window:
@@ -28,6 +35,7 @@ class Window:
         self.time_units = "us"
         self.amp_units = "mV"
         self.AWG_clock = 1e8
+        self.AWGMax_amp = 1   # Maximum amplitude in Volts
         
         #gui initialization from the glade file
         self.gladefile = "awg_gui.glade"
@@ -41,6 +49,16 @@ class Window:
         self.window.show()
 
         self.builder.connect_signals(self)
+
+
+        AWG.set_ch1_amplitude(self.AWGMax_amp)  # Setting maximum needed amp on all AWG channels
+        AWG.set_ch2_amplitude(self.AWGMax_amp) 
+        AWG.set_ch3_amplitude(self.AWGMax_amp) 
+        AWG.set_ch4_amplitude(self.AWGMax_amp) 
+   
+        
+        AWG.del_waveform_all()  # Clear all waveforms in waveform list
+        AWG.set_clock(self.AWG_clock)  # Set AWG clock
         
         #create a waveform object
         self.wav_obj = Wav.Waveform(waveform_name = 'WAV1', AWG_clock = self.AWG_clock, TimeUnits = self.time_units , AmpUnits = self.amp_units)
@@ -459,6 +477,14 @@ class Window:
         axarr[2].legend()
         axarr[2].set_xlabel("Time[" + self.time_units + "]")
         plt.show()
+
+        self.wav_obj.CH4.rescaleAmplitude(self.AWGMax_amp)
+        AWG.send_waveform_object(Wav = self.wav_obj.CH4, path = 'C:\SEQwav\\')
+        AWG.import_waveform_object(Wav = self.wav_obj.CH4, path = 'C:\SEQwav\\')
+        AWG.import_waveform_object(Wav = self.wav_obj.CH4, path = 'C:\SEQwav\\')
+        AWG.load_waveform(4, self.wav_obj.CH4.waveform_name, drive='C:', path='C:\SEQwav\\')
+
+
 win = Window()
 gtk.main()
         
