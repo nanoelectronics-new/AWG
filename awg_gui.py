@@ -51,7 +51,7 @@ class Window:
         self.treeview_list = gtk.ListStore(str,str,str,str,str,str,str,str,str,str,str,str,str,str)
         self.treeview.set_model(self.treeview_list)
         #note that this has only 13 columns, the first column since depends on the segment number has to inserted at the first position manually
-        self.default_treeview_list = [100,0,0,0,0,0,0,0,0,0,0,0,0]
+        self.default_treeview_list = [100,0,'L','L',0,'L','L',0,'L','L',0,'L','L']
         for i in range(self.num_seg):
             self.treeview_list.append([i+1] + self.default_treeview_list)
         
@@ -218,95 +218,120 @@ class Window:
         self.model = widget.get_model()
         self.amp_units = self.model[self.index][1]
         print "Amplitide units units set to",self.amp_units
-        self.statusbar.push(self.context_id, "No. of Segments: " + str(self.num_seg) + " | Time Units: " + str(self.time_units) +  " | Amplitude Units: " + str(self.amp_units)) 
+        self.statusbar.push(self.context_id, "No. of Segments: " + str(self.num_seg) + " | Time Units: " + str(self.time_units) +  " | Amplitude Units: " + str(self.amp_units))     
         self.wav_obj.AmpUnits = self.amp_units
     
+    def set_marker_from_input_m1(self,i,index):
+        #i is the segment index along column
+        #index is index along the row
+        if self.treeview_list[i][index] == 'L':
+            self.seg_list_m1 += [0.0]
+        elif self.treeview_list[i][index] == 'H':
+            self.seg_list_m1 += [1.0]
+        else:
+            raise Exception('Error in setting markers - input value must be L or H')
+
+    def set_marker_from_input_m2(self,i,index):
+        #i is the segment index along column
+        #index is index along the row
+        if self.treeview_list[i][index] == 'L':
+            self.seg_list_m2 += [0.0]
+        elif self.treeview_list[i][index] == 'H':
+            self.seg_list_m2 += [1.0]
+        else:
+            raise Exception('Error in setting markers - input value must be L or H')
+
     def text_edited(self,widget,path,text,index):
         self.treeview_list[path][index] = text
         if 2 <=index <= 4:
-            seg_list_a = []
-            seg_list_m1 = []
-            seg_list_m2 = []
+            self.seg_list_a = []
+            self.seg_list_m1 = []
+            self.seg_list_m2 = []
             for i in range(self.num_seg):
-                seg_list_a += [[float(self.treeview_list[i][1]),float(self.treeview_list[i][2])]]
-                seg_list_m1 += [float(self.treeview_list[i][3])]
-                seg_list_m2 += [float(self.treeview_list[i][4])]
+                self.seg_list_a += [[float(self.treeview_list[i][1]),float(self.treeview_list[i][2])]]
+                self.set_marker_from_input_m1(i,3)
+                self.set_marker_from_input_m2(i,4)
 
-            self.wav_obj.setValuesCH1(*seg_list_a)
-            self.wav_obj.setMarkersCH1(seg_list_m1,seg_list_m2)
+            self.wav_obj.setValuesCH1(*self.seg_list_a)
+            self.wav_obj.setMarkersCH1(self.seg_list_m1,self.seg_list_m2)
 
         elif 5 <=index <= 7:
-            seg_list_a = []
-            seg_list_m1 = []
-            seg_list_m2 = []
+            self.seg_list_a = []
+            self.seg_list_m1 = []
+            self.seg_list_m2 = []
             for i in range(self.num_seg):
-                seg_list_a += [[float(self.treeview_list[i][1]),float(self.treeview_list[i][5])]]
-                seg_list_m1 += [float(self.treeview_list[i][6])]
-                seg_list_m2 += [float(self.treeview_list[i][7])]
+                self.seg_list_a += [[float(self.treeview_list[i][1]),float(self.treeview_list[i][5])]]
+                self.set_marker_from_input_m1(i,6)
+                self.set_marker_from_input_m2(i,7)
 
-            self.wav_obj.setValuesCH2(*seg_list_a)
-            self.wav_obj.setMarkersCH2(seg_list_m1,seg_list_m2)
+            self.wav_obj.setValuesCH2(*self.seg_list_a)
+            self.wav_obj.setMarkersCH2(self.seg_list_m1,self.seg_list_m2)
         elif 8 <=index <= 10:
-            seg_list_a = []
-            seg_list_m1 = []
-            seg_list_m2 = []
+            self.seg_list_a = []
+            self.seg_list_m1 = []
+            self.seg_list_m2 = []
             for i in range(self.num_seg):
-                seg_list_a += [[float(self.treeview_list[i][1]),float(self.treeview_list[i][8])]]
-                seg_list_m1 += [float(self.treeview_list[i][9])]
-                seg_list_m2 += [float(self.treeview_list[i][10])]
-
-            self.wav_obj.setValuesCH3(*seg_list_a)
-            self.wav_obj.setMarkersCH3(seg_list_m1,seg_list_m2)
+                self.seg_list_a += [[float(self.treeview_list[i][1]),float(self.treeview_list[i][8])]]
+                self.set_marker_from_input_m1(i,9)
+                self.set_marker_from_input_m2(i,10)
+            
+            self.wav_obj.setValuesCH3(*self.seg_list_a)
+            self.wav_obj.setMarkersCH3(self.seg_list_m1,self.seg_list_m2)
         elif 11 <=index <= 13:
-            seg_list_a = []
-            seg_list_m1 = []
-            seg_list_m2 = []
+            self.seg_list_a = []
+            self.seg_list_m1 = []
+            self.seg_list_m2 = []
             for i in range(self.num_seg):
                 seg_list_a += [[float(self.treeview_list[i][1]),float(self.treeview_list[i][11])]]
-                seg_list_m1 += [float(self.treeview_list[i][12])]
-                seg_list_m2 += [float(self.treeview_list[i][13])]
-
-            self.wav_obj.setValuesCH4(*seg_list_a)
-            self.wav_obj.setMarkersCH4(seg_list_m1,seg_list_m2)
+                self.set_marker_from_input_m1(i,12)
+                self.set_marker_from_input_m2(i,13)
+              
+            self.wav_obj.setValuesCH4(*self.seg_list_a)
+            self.wav_obj.setMarkersCH4(self.seg_list_m1,self.seg_list_m2)
         #user only changes the time
         else:
-            seg_list_a = []
+            self.seg_list_a = []
             #channel 1
             for i in range(self.num_seg):
-                seg_list_a += [[float(self.treeview_list[i][1]),float(self.treeview_list[i][2])]]
-            self.wav_obj.setValuesCH1(*seg_list_a)
+                self.seg_list_a += [[float(self.treeview_list[i][1]),float(self.treeview_list[i][2])]]
+            self.wav_obj.setValuesCH1(*self.seg_list_a)
             #channel 2
             for i in range(self.num_seg):
-                seg_list_a += [[float(self.treeview_list[i][1]),float(self.treeview_list[i][5])]]
-            self.wav_obj.setValuesCH2(*seg_list_a)
+                self.seg_list_a += [[float(self.treeview_list[i][1]),float(self.treeview_list[i][5])]]
+            self.wav_obj.setValuesCH2(*self.seg_list_a)
             #channel 3
             for i in range(self.num_seg):
-                seg_list_a += [[float(self.treeview_list[i][1]),float(self.treeview_list[i][8])]]
-            self.wav_obj.setValuesCH3(*seg_list_a)
+                self.seg_list_a += [[float(self.treeview_list[i][1]),float(self.treeview_list[i][8])]]
+            self.wav_obj.setValuesCH3(*self.seg_list_a)
             #channel 4
             for i in range(self.num_seg):
-                seg_list_a += [[float(self.treeview_list[i][1]),float(self.treeview_list[i][11])]]
-            self.wav_obj.setValuesCH4(*seg_list_a)
+                self.seg_list_a += [[float(self.treeview_list[i][1]),float(self.treeview_list[i][11])]]
+            self.wav_obj.setValuesCH4(*self.seg_list_a)
 
-
+    def convert_marker_to_float(self,val):
+        if val == 'H':
+            return 1.0
+        else:
+            return 0.0 
 
     def on_plot1_clicked(self,widget,data=None):
+
         points_list_a = [(0,float(self.treeview_list[0][2]))]
-        points_list_m1 = [(0,float(self.treeview_list[0][3]))]
-        points_list_m2 = [(0,float(self.treeview_list[0][4]))]
+        points_list_m1 = [(0,self.convert_marker_to_float(self.treeview_list[0][3]))]
+        points_list_m2 = [(0,self.convert_marker_to_float(self.treeview_list[0][4]))]
         t = 0
         for i in range(self.num_seg-1):
             t = t + float(self.treeview_list[i][1])
             points_list_a.append((t,float(self.treeview_list[i][2])))
             points_list_a.append((t,float(self.treeview_list[i+1][2])))
-            points_list_m1.append((t,float(self.treeview_list[i][3])))
-            points_list_m1.append((t,float(self.treeview_list[i+1][3])))
-            points_list_m2.append((t,float(self.treeview_list[i][4])))
-            points_list_m2.append((t,float(self.treeview_list[i+1][4])))
+            points_list_m1.append((t,self.convert_marker_to_float(self.treeview_list[i][3])))
+            points_list_m1.append((t,self.convert_marker_to_float(self.treeview_list[i+1][3])))
+            points_list_m2.append((t,self.convert_marker_to_float(self.treeview_list[i][4])))
+            points_list_m2.append((t,self.convert_marker_to_float(self.treeview_list[i+1][4])))
         t = t + float(self.treeview_list[self.num_seg - 1][1])
         points_list_a.append((t,float(self.treeview_list[self.num_seg - 1][2])))
-        points_list_m1.append((t,float(self.treeview_list[self.num_seg - 1][3])))
-        points_list_m2.append((t,float(self.treeview_list[self.num_seg - 1][4])))
+        points_list_m1.append((t,self.convert_marker_to_float(self.treeview_list[self.num_seg - 1][3])))
+        points_list_m2.append((t,self.convert_marker_to_float(self.treeview_list[self.num_seg - 1][4])))
 
 
         f, axarr = plt.subplots(3, sharex=True)
@@ -328,21 +353,21 @@ class Window:
 
     def on_plot2_clicked(self,widget,data=None):
         points_list_a = [(0,float(self.treeview_list[0][5]))]
-        points_list_m1 = [(0,float(self.treeview_list[0][6]))]
-        points_list_m2 = [(0,float(self.treeview_list[0][7]))]
+        points_list_m1 = [(0,self.convert_marker_to_float(self.treeview_list[0][6]))]
+        points_list_m2 = [(0,self.convert_marker_to_float(self.treeview_list[0][7]))]
         t = 0
         for i in range(self.num_seg-1):
             t = t + float(self.treeview_list[i][1])
             points_list_a.append((t,float(self.treeview_list[i][5])))
             points_list_a.append((t,float(self.treeview_list[i+1][5])))
-            points_list_m1.append((t,float(self.treeview_list[i][6])))
-            points_list_m1.append((t,float(self.treeview_list[i+1][6])))
-            points_list_m2.append((t,float(self.treeview_list[i][7])))
-            points_list_m2.append((t,float(self.treeview_list[i+1][7])))
+            points_list_m1.append((t,self.convert_marker_to_float(self.treeview_list[i][6])))
+            points_list_m1.append((t,self.convert_marker_to_float(self.treeview_list[i+1][6])))
+            points_list_m2.append((t,self.convert_marker_to_float(self.treeview_list[i][7])))
+            points_list_m2.append((t,self.convert_marker_to_float(self.treeview_list[i+1][7])))
         t = t + float(self.treeview_list[self.num_seg - 1][1])
         points_list_a.append((t,float(self.treeview_list[self.num_seg - 1][5])))
-        points_list_m1.append((t,float(self.treeview_list[self.num_seg - 1][6])))
-        points_list_m2.append((t,float(self.treeview_list[self.num_seg - 1][7])))
+        points_list_m1.append((t,self.convert_marker_to_float(self.treeview_list[self.num_seg - 1][6])))
+        points_list_m2.append((t,self.convert_marker_to_float(self.treeview_list[self.num_seg - 1][7])))
 
 
         f, axarr = plt.subplots(3, sharex=True)
@@ -363,21 +388,21 @@ class Window:
 
     def on_plot3_clicked(self,widget,data=None):
         points_list_a = [(0,float(self.treeview_list[0][8]))]
-        points_list_m1 = [(0,float(self.treeview_list[0][9]))]
-        points_list_m2 = [(0,float(self.treeview_list[0][10]))]
+        points_list_m1 = [(0,self.convert_marker_to_float(self.treeview_list[0][9]))]
+        points_list_m2 = [(0,self.convert_marker_to_float(self.treeview_list[0][10]))]
         t = 0
         for i in range(self.num_seg-1):
             t = t + float(self.treeview_list[i][1])
             points_list_a.append((t,float(self.treeview_list[i][8])))
             points_list_a.append((t,float(self.treeview_list[i+1][8])))
-            points_list_m1.append((t,float(self.treeview_list[i][9])))
-            points_list_m1.append((t,float(self.treeview_list[i+1][9])))
-            points_list_m2.append((t,float(self.treeview_list[i][10])))
-            points_list_m2.append((t,float(self.treeview_list[i+1][10])))
+            points_list_m1.append((t,self.convert_marker_to_float(self.treeview_list[i][9])))
+            points_list_m1.append((t,self.convert_marker_to_float(self.treeview_list[i+1][9])))
+            points_list_m2.append((t,self.convert_marker_to_float(self.treeview_list[i][10])))
+            points_list_m2.append((t,self.convert_marker_to_float(self.treeview_list[i+1][10])))
         t = t + float(self.treeview_list[self.num_seg - 1][1])
         points_list_a.append((t,float(self.treeview_list[self.num_seg - 1][8])))
-        points_list_m1.append((t,float(self.treeview_list[self.num_seg - 1][9])))
-        points_list_m2.append((t,float(self.treeview_list[self.num_seg - 1][10])))
+        points_list_m1.append((t,self.convert_marker_to_float(self.treeview_list[self.num_seg - 1][9])))
+        points_list_m2.append((t,self.convert_marker_to_float(self.treeview_list[self.num_seg - 1][10])))
 
 
         f, axarr = plt.subplots(3, sharex=True)
@@ -398,21 +423,21 @@ class Window:
 
     def on_plot4_clicked(self,widget,data=None):
         points_list_a = [(0,float(self.treeview_list[0][11]))]
-        points_list_m1 = [(0,float(self.treeview_list[0][12]))]
-        points_list_m2 = [(0,float(self.treeview_list[0][13]))]
+        points_list_m1 = [(0,self.convert_marker_to_float(self.treeview_list[0][12]))]
+        points_list_m2 = [(0,self.convert_marker_to_float(self.treeview_list[0][13]))]
         t = 0
         for i in range(self.num_seg-1):
             t = t + float(self.treeview_list[i][1])
             points_list_a.append((t,float(self.treeview_list[i][11])))
             points_list_a.append((t,float(self.treeview_list[i+1][11])))
-            points_list_m1.append((t,float(self.treeview_list[i][12])))
-            points_list_m1.append((t,float(self.treeview_list[i+1][12])))
-            points_list_m2.append((t,float(self.treeview_list[i][13])))
-            points_list_m2.append((t,float(self.treeview_list[i+1][13])))
+            points_list_m1.append((t,self.convert_marker_to_float(self.treeview_list[i][12])))
+            points_list_m1.append((t,self.convert_marker_to_float(self.treeview_list[i+1][12])))
+            points_list_m2.append((t,self.convert_marker_to_float(self.treeview_list[i][13])))
+            points_list_m2.append((t,self.convert_marker_to_float(self.treeview_list[i+1][13])))
         t = t + float(self.treeview_list[self.num_seg - 1][1])
         points_list_a.append((t,float(self.treeview_list[self.num_seg - 1][11])))
-        points_list_m1.append((t,float(self.treeview_list[self.num_seg - 1][12])))
-        points_list_m2.append((t,float(self.treeview_list[self.num_seg - 1][13])))
+        points_list_m1.append((t,self.convert_marker_to_float(self.treeview_list[self.num_seg - 1][12])))
+        points_list_m2.append((t,self.convert_marker_to_float(self.treeview_list[self.num_seg - 1][13])))
 
 
         f, axarr = plt.subplots(3, sharex=True)
