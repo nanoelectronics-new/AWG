@@ -51,7 +51,7 @@ class Window:
         self.treeview_list = gtk.ListStore(str,str,str,str,str,str,str,str,str,str,str,str,str,str)
         self.treeview.set_model(self.treeview_list)
         #note that this has only 13 columns, the first column since depends on the segment number has to inserted at the first position manually
-        self.default_treeview_list = [100,0,'L','L',0,'L','L',0,'L','L',0,'L','L']
+        self.default_treeview_list = [0.001,0,'L','L',0,'L','L',0,'L','L',0,'L','L']
         for i in range(self.num_seg):
             self.treeview_list.append([i+1] + self.default_treeview_list)
         
@@ -170,11 +170,12 @@ class Window:
         self.time_units_list.append([0,"s"])
         self.time_units_list.append([1,"ms"])
         self.time_units_list.append([2,"us"])
-        self.time_units_list.append([3,"ns"])
+    
 
         self.amp_units_list = gtk.ListStore(int,str)
         self.amp_units_list.append([0,"V"])
         self.amp_units_list.append([1,"mV"])
+        self.amp_units_list.append([2,"uV"])
 
         #initialization of the comboboxes for time and amplitude units
         self.time_units_box = self.builder.get_object("time_units_box")
@@ -184,6 +185,7 @@ class Window:
         self.cell = gtk.CellRendererText()
         self.time_units_box.pack_start(self.cell,True)
         self.time_units_box.add_attribute(self.cell, 'text', 1)
+        #set_active sets the default value
         self.time_units_box.set_active(2)
         self.amp_units_box.pack_start(self.cell,True)
         self.amp_units_box.add_attribute(self.cell, 'text', 1)
@@ -211,7 +213,8 @@ class Window:
         self.time_units = self.model[self.index][1]
         print "Time units set to",self.time_units
         self.statusbar.push(self.context_id, "No. of Segments: " + str(self.num_seg) + " | Time Units: " + str(self.time_units) +  " | Amplitude Units: " + str(self.amp_units)) 
-        self.wav_obj.TimeUnits = self.time_units
+        self.wav_obj.Change_time_units(self.time_units)
+       
 
     def on_amp_units_box_changed(self,widget,data=None):
         self.index = widget.get_active()
@@ -219,7 +222,7 @@ class Window:
         self.amp_units = self.model[self.index][1]
         print "Amplitide units units set to",self.amp_units
         self.statusbar.push(self.context_id, "No. of Segments: " + str(self.num_seg) + " | Time Units: " + str(self.time_units) +  " | Amplitude Units: " + str(self.amp_units))     
-        self.wav_obj.AmpUnits = self.amp_units
+        self.wav_obj.Change_amp_units(self.amp_units) 
     
     def set_marker_from_input_m1(self,i,index):
         #i is the segment index along column
@@ -242,6 +245,7 @@ class Window:
             raise Exception('Error in setting markers - input value must be L or H')
 
     def text_edited(self,widget,path,text,index):
+
         self.treeview_list[path][index] = text
         if 2 <=index <= 4:
             self.seg_list_a = []
@@ -282,7 +286,7 @@ class Window:
             self.seg_list_m1 = []
             self.seg_list_m2 = []
             for i in range(self.num_seg):
-                seg_list_a += [[float(self.treeview_list[i][1]),float(self.treeview_list[i][11])]]
+                self.seg_list_a += [[float(self.treeview_list[i][1]),float(self.treeview_list[i][11])]]
                 self.set_marker_from_input_m1(i,12)
                 self.set_marker_from_input_m2(i,13)
               

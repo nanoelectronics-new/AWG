@@ -400,6 +400,37 @@ class Waveform():
         self.CH2.rescaleAmplitude(AWGMaxAmp)
         self.CH3.rescaleAmplitude(AWGMaxAmp)
         self.CH4.rescaleAmplitude(AWGMaxAmp)
+
+    def Change_time_units(self, new_unit):
+        '''Function for on the fly changing the time units of the waveform
+            Raises exception if time unit is not one of: us, ms, s'''
+        if new_unit in self.CH1.TimeUnitsDict.keys():
+            self.CH1.TimeUnitsKey = new_unit
+            self.CH1.TimeUnits = self.CH1.TimeUnitsDict[new_unit]
+            self.CH2.TimeUnitsKey = new_unit
+            self.CH2.TimeUnits = self.CH1.TimeUnitsDict[new_unit]
+            self.CH3.TimeUnitsKey = new_unit
+            self.CH3.TimeUnits = self.CH1.TimeUnitsDict[new_unit]
+            self.CH4.TimeUnitsKey = new_unit
+            self.CH4.TimeUnits = self.CH1.TimeUnitsDict[new_unit]
+        else:
+            raise Exception("%s not a proper unit!"%new_unit)
+
+
+    def Change_amp_units(self, new_unit):
+        '''Function for on the fly changing the amplitude units of the waveform
+            Raises exception if amp unit is not one of: uV, mV, V'''
+        if new_unit in self.CH1.AmpUnitsDict.keys():
+            self.CH1.AmpUnitsKey = new_unit   
+            self.CH1.AmpUnits = self.CH1.AmpUnitsDict[new_unit]
+            self.CH2.AmpUnitsKey = new_unit 
+            self.CH2.AmpUnits = self.CH1.AmpUnitsDict[new_unit]
+            self.CH3.AmpUnitsKey = new_unit 
+            self.CH3.AmpUnits = self.CH1.AmpUnitsDict[new_unit]
+            self.CH4.AmpUnitsKey = new_unit 
+            self.CH4.AmpUnits = self.CH1.AmpUnitsDict[new_unit]
+        else:
+            raise Exception("%s not a proper unit!"%new_unit)
         
     
            
