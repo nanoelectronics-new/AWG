@@ -17,13 +17,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 import Waveform_PresetAmp as Wav
+reload(Wav)
 import qt
 
 if 'AWG' in locals():
     AWG._ins._visainstrument.close()   # Trying to close previous AWG session. 
 
        
-AWG = qt.instruments.create('AWG', 'Tektronix_AWG5014', address='169.254.111.236')
+AWG = qt.instruments.create('AWG', 'Tektronix_AWG5014', address="10.21.64.191")
 
 
 class Window:
@@ -32,7 +33,7 @@ class Window:
         #default values
         #also change the set_active values to make change in GUI if changing the default values
         self.num_seg = 3
-        self.time_units = "us"
+        self.time_units = "ms"
         self.amp_units = "mV"
         self.AWG_clock = 1e8
         self.AWGMax_amp = 1   # Maximum amplitude in Volts
@@ -204,7 +205,7 @@ class Window:
         self.time_units_box.pack_start(self.cell,True)
         self.time_units_box.add_attribute(self.cell, 'text', 1)
         #set_active sets the default value
-        self.time_units_box.set_active(2)
+        self.time_units_box.set_active(1)
         self.amp_units_box.pack_start(self.cell,True)
         self.amp_units_box.add_attribute(self.cell, 'text', 1)
         self.amp_units_box.set_active(1)
@@ -241,6 +242,7 @@ class Window:
         print "Amplitide units units set to",self.amp_units
         self.statusbar.push(self.context_id, "No. of Segments: " + str(self.num_seg) + " | Time Units: " + str(self.time_units) +  " | Amplitude Units: " + str(self.amp_units))     
         self.wav_obj.Change_amp_units(self.amp_units) 
+
     
     def set_marker_from_input_m1(self,i,index):
         #i is the segment index along column
@@ -318,14 +320,17 @@ class Window:
                 self.seg_list_a += [[float(self.treeview_list[i][1]),float(self.treeview_list[i][2])]]
             self.wav_obj.setValuesCH1(*self.seg_list_a)
             #channel 2
+            self.seg_list_a = []
             for i in range(self.num_seg):
                 self.seg_list_a += [[float(self.treeview_list[i][1]),float(self.treeview_list[i][5])]]
             self.wav_obj.setValuesCH2(*self.seg_list_a)
             #channel 3
+            self.seg_list_a = []
             for i in range(self.num_seg):
                 self.seg_list_a += [[float(self.treeview_list[i][1]),float(self.treeview_list[i][8])]]
             self.wav_obj.setValuesCH3(*self.seg_list_a)
             #channel 4
+            self.seg_list_a = []
             for i in range(self.num_seg):
                 self.seg_list_a += [[float(self.treeview_list[i][1]),float(self.treeview_list[i][11])]]
             self.wav_obj.setValuesCH4(*self.seg_list_a)
@@ -482,7 +487,7 @@ class Window:
         AWG.send_waveform_object(Wav = self.wav_obj.CH4, path = 'C:\SEQwav\\')
         AWG.import_waveform_object(Wav = self.wav_obj.CH4, path = 'C:\SEQwav\\')
         AWG.import_waveform_object(Wav = self.wav_obj.CH4, path = 'C:\SEQwav\\')
-        AWG.load_waveform(4, self.wav_obj.CH4.waveform_name, drive='C:', path='C:\SEQwav\\')
+        AWG.load_waveform(3, self.wav_obj.CH4.waveform_name, drive='C:', path='C:\SEQwav\\')
 
 
 win = Window()

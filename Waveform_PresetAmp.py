@@ -31,6 +31,7 @@ class Pulse():
         self.marker2_dict = dict()
     
         self.waveform = np.array([])                                
+        self.unscaled_waveform = np.array([])                                
         self.marker1 = np.array([])
         self.marker2 = np.array([])
         
@@ -47,6 +48,8 @@ class Pulse():
         self.TimeUnits = self.TimeUnitsDict[self.TimeUnitsKey]
         self.AmpUnitsKey = AmpUnits
         self.AmpUnits = self.AmpUnitsDict[self.AmpUnitsKey]
+
+
         
         self.waveform_name = waveform_name
         #self.Max_amp = 0
@@ -118,6 +121,7 @@ class Pulse():
         
         for key in sorted(self.amplitudes.iterkeys()):  # Sort amplitudes dict and iterate trough its element from the frist one
             
+            
             Length = self.rescaleLength(self.timings[key]) # Rescaling length 
             
             Start_amp = self.amplitudes[key][0]         # Amplitude of starting wavefrom part             
@@ -128,7 +132,8 @@ class Pulse():
             Marker2 = self.marker2_dict[key]    # Value of marker2 in current segment
             self.marker1 = np.concatenate((self.marker1,np.linspace(Marker1,Marker1,Length))) 
             self.marker2 = np.concatenate((self.marker2,np.linspace(Marker2,Marker2,Length)))
-        
+
+        self.unscaled_waveform = self.waveform # Buffer waveform to be scaled - in order to avoid multiple rescalings
         #self.rescaleAmplitude() # Resclaing amplitude for getting correct output on AWG
         
         
@@ -141,7 +146,8 @@ class Pulse():
         return Length
         
     def rescaleAmplitude(self, AWGMaxAmp):
-        self.waveform = self.waveform*self.AmpUnits      # Converting from selected units to V
+        self.waveform = self.unscaled_waveform*self.AmpUnits
+        # Converting from selected units to V
         #self.Max_amp = max(self.waveform)         # Saving Max_amp to be able to set the AWG
         self.waveform = self.waveform/AWGMaxAmp     # Scaling
     
@@ -454,11 +460,11 @@ class Waveform():
                 buffer_dict_Amplitudes[key] = (item[1],item[1])  # Creating amplitude chunk for rect segment 
             buffer_dict_Timings[key] = (item[0])
             
-        pulse.setAmplitudes(**buffer_dict_Amplitudes)    # Passing amplitude info to Pulse class (passed as dict)
         pulse.setTimings(**buffer_dict_Timings)    # Passing timing info to Pulse class (passed as dict)
+        pulse.setAmplitudes(**buffer_dict_Amplitudes)    # Passing amplitude info to Pulse class (passed as dict)
         self.lengthV = len(buffer_dict_Timings)    # Synchronization 
-        if self.lengthV == self.lengthM:
-            pulse.plotWaveform()
+        #if self.lengthV == self.lengthM:
+            #pulse.plotWaveform()
         
         
             
@@ -483,8 +489,8 @@ class Waveform():
         pulse.setMarker1(**buffer_dict_Marker1) 
         pulse.setMarker2(**buffer_dict_Marker2)
         self.lengthM = len(buffer_dict_Marker2)    # Synchronization 
-        if self.lengthV == self.lengthM:
-            pulse.plotWaveform()
+        #if self.lengthV == self.lengthM:
+            #pulse.plotWaveform()
             
             
 ## SEQUENCES    
