@@ -35,8 +35,8 @@ class Window:
         self.num_seg = 3
         self.time_units = "ms"
         self.amp_units = "mV"
-        self.AWG_clock = 1e8
-        self.AWGMax_amp = 1   # Maximum amplitude in Volts
+        self.awg_clock = 1e8
+        self.max_amp = 1   # Maximum amplitude in Volts
         
         #gui initialization from the glade file
         self.gladefile = "awg_gui.glade"
@@ -52,10 +52,10 @@ class Window:
         self.builder.connect_signals(self)
 
 
-        AWG.set_ch1_amplitude(self.AWGMax_amp)  # Setting maximum needed amp on all AWG channels
-        AWG.set_ch2_amplitude(self.AWGMax_amp) 
-        AWG.set_ch3_amplitude(self.AWGMax_amp) 
-        AWG.set_ch4_amplitude(self.AWGMax_amp) 
+        AWG.set_ch1_amplitude(self.max_amp)  # Setting maximum needed amp on all AWG channels
+        AWG.set_ch2_amplitude(self.max_amp) 
+        AWG.set_ch3_amplitude(self.max_amp) 
+        AWG.set_ch4_amplitude(self.max_amp) 
    
         
         AWG.del_waveform_all()  # Clear all waveforms in waveform list
@@ -210,7 +210,7 @@ class Window:
         self.amp_units_box.add_attribute(self.cell, 'text', 1)
         self.amp_units_box.set_active(1)
 
-        self.statusbar.push(self.context_id, "No. of Segments: " + str(self.num_seg) + " | Time Units: " + str(self.time_units) +  " | Amplitude Units: " + str(self.amp_units)) 
+        self.statusbar.push(self.context_id, "No. of Segments: " + str(self.num_seg) + " | Time Units: " + str(self.time_units) +  " | Amplitude Units: " + str(self.amp_units) + " | AWG Clock: " + str(self.awg_clock) + " | Max. Amplitude: " + str(self.max_amp)) 
 
 
     def on_window1_destroy(self, object, data=None):
@@ -221,7 +221,7 @@ class Window:
         self.num_seg_entry = self.builder.get_object("num_seg_entry")
         self.num_seg = int(self.num_seg_entry.get_text())
         print "Number of segments set to",self.num_seg
-        self.statusbar.push(self.context_id, "No. of Segments: " + str(self.num_seg) + " | Time Units: " + str(self.time_units) +  " | Amplitude Units: " + str(self.amp_units)) 
+        self.statusbar.push(self.context_id, "No. of Segments: " + str(self.num_seg) + " | Time Units: " + str(self.time_units) +  " | Amplitude Units: " + str(self.amp_units) + " | AWG Clock: " + str(self.awg_clock) + " | Max. Amplitude: " + str(self.max_amp)) 
         self.treeview_list.clear()
         for i in range(self.num_seg):
             self.treeview_list.append([i+1] + self.default_treeview_list)
@@ -231,7 +231,7 @@ class Window:
         self.model = widget.get_model()
         self.time_units = self.model[self.index][1]
         print "Time units set to",self.time_units
-        self.statusbar.push(self.context_id, "No. of Segments: " + str(self.num_seg) + " | Time Units: " + str(self.time_units) +  " | Amplitude Units: " + str(self.amp_units)) 
+        self.statusbar.push(self.context_id, "No. of Segments: " + str(self.num_seg) + " | Time Units: " + str(self.time_units) +  " | Amplitude Units: " + str(self.amp_units) + " | AWG Clock: " + str(self.awg_clock) + " | Max. Amplitude: " + str(self.max_amp)) 
         self.wav_obj.Change_time_units(self.time_units)
        
 
@@ -240,9 +240,29 @@ class Window:
         self.model = widget.get_model()
         self.amp_units = self.model[self.index][1]
         print "Amplitide units units set to",self.amp_units
-        self.statusbar.push(self.context_id, "No. of Segments: " + str(self.num_seg) + " | Time Units: " + str(self.time_units) +  " | Amplitude Units: " + str(self.amp_units))     
+        self.statusbar.push(self.context_id, "No. of Segments: " + str(self.num_seg) + " | Time Units: " + str(self.time_units) +  " | Amplitude Units: " + str(self.amp_units) + " | AWG Clock: " + str(self.awg_clock) + " | Max. Amplitude: " + str(self.max_amp)) 
         self.wav_obj.Change_amp_units(self.amp_units) 
 
+
+    def on_awg_clock_set_clicked(self,button,data=None):
+        self.awg_clock_entry = self.builder.get_object("awg_clock_entry")
+        self.awg_clock = float(self.awg_clock_entry.get_text())
+        print "AWG Clock set to",self.awg_clock
+        self.statusbar.push(self.context_id, "No. of Segments: " + str(self.num_seg) + " | Time Units: " + str(self.time_units) +  " | Amplitude Units: " + str(self.amp_units) + " | AWG Clock: " + str(self.awg_clock) + " | Max. Amplitude: " + str(self.max_amp)) 
+        AWG.set_clock(self.AWG_clock)  # Set AWG clock
+    
+    def on_max_amp_set_clicked(self,button,data=None):
+        self.max_amp_entry = self.builder.get_object("max_amp_entry")
+        self.max_amp = float(self.max_amp_entry.get_text())
+        print "Maximum Amplitude set to",self.max_amp
+        self.statusbar.push(self.context_id, "No. of Segments: " + str(self.num_seg) + " | Time Units: " + str(self.time_units) +  " | Amplitude Units: " + str(self.amp_units) + " | AWG Clock: " + str(self.awg_clock) + " | Max. Amplitude: " + str(self.max_amp)) 
+        AWG.set_ch1_amplitude(self.max_amp)  # Setting maximum needed amp on all AWG channels
+        AWG.set_ch2_amplitude(self.max_amp) 
+        AWG.set_ch3_amplitude(self.max_amp) 
+        AWG.set_ch4_amplitude(self.max_amp) 
+        
+
+        
     
     def set_marker_from_input_m1(self,i,index):
         #i is the segment index along column
@@ -483,12 +503,93 @@ class Window:
         axarr[2].set_xlabel("Time[" + self.time_units + "]")
         plt.show()
 
+    def on_awg_upload_clicked(self,button,data=None):
         self.wav_obj.CH4.rescaleAmplitude(self.AWGMax_amp)
-        
+
         AWG.send_waveform_object(Wav = self.wav_obj.CH4, path = 'C:\SEQwav\\')
         AWG.import_waveform_object(Wav = self.wav_obj.CH4, path = 'C:\SEQwav\\')
         AWG.import_waveform_object(Wav = self.wav_obj.CH4, path = 'C:\SEQwav\\')
         AWG.load_waveform(3, self.wav_obj.CH4.waveform_name, drive='C:', path='C:\SEQwav\\')
+
+    def on_save_waveform_clicked(self,widget,data=None):
+        dialog = gtk.FileChooserDialog("Save waveform",self.window,gtk.FILE_CHOOSER_ACTION_SAVE,(gtk.STOCK_SAVE,gtk.RESPONSE_ACCEPT,gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL))
+        dialog.set_property("do-overwrite-confirmation",True)
+        dialog.set_current_folder("~/")
+
+        response = dialog.run()
+
+        if response == gtk.RESPONSE_ACCEPT:
+            #note that filename also contains the path
+            filename = dialog.get_filename()
+            #safety first
+            if not filename.endswith(".txt"):
+                filename += ".txt"
+            f = open(filename,'w')
+            #write the settings
+            f.write("num_seg " + str(self.num_seg) + "\n")
+            f.write("time_units " + str(self.time_units) + "\n")
+            f.write("amp_units " + str(self.amp_units) + "\n")
+            f.write("awg_clock " + str(self.awg_clock) + "\n")
+            f.write("max_amp " +  str(self.max_amp) + "\n")
+            
+            #write the segments in the same format it is visible on the GUI
+            for i in range(self.num_seg):
+                line = ""
+                for j in range(len(self.treeview_list[0])):
+                    line += str(self.treeview_list[i][j])
+                line += "\n"
+                f.write(line)
+            f.close()
+        dialog.destroy()
+    def on_load_waveform_clicked(self,widget,data=None):
+        dialog = gtk.FileChooserDialog("Open waveform",self.window,gtk.FILE_CHOOSER_ACTION_OPEN,(gtk.STOCK_OPEN,gtk.RESPONSE_OK,gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL))
+        dialog.set_current_folder("~/")
+
+        response = dialog.run()
+        if response == gtk.RESPONSE_OK:
+            filepath = dialog.get_filename()
+            f = open(filepath)
+            wav_label = self.builder.get_object("load_waveform_label")
+            wav_label.set_text(filepath.split('//')[-1])
+            print f
+            f.close()
+        dialog.destroy()
+
+    def on_open_waveform1_clicked(self,widget,data=None):
+        dialog = gtk.FileChooserDialog("Open waveform",self.window,gtk.FILE_CHOOSER_ACTION_OPEN,(gtk.STOCK_OPEN,gtk.RESPONSE_OK,gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL))
+        dialog.set_current_folder("~/")
+
+        response = dialog.run()
+        if response == gtk.RESPONSE_OK:
+            filepath = dialog.get_filename()
+            f = open(filepath)
+            wav1_label = self.builder.get_object("wav1_label")
+            wav1_label.set_text(filepath)
+            print f
+            f.close()
+        dialog.destroy()
+
+    def on_open_waveform2_clicked(self,widget,data=None):
+        dialog = gtk.FileChooserDialog("Open waveform",self.window,gtk.FILE_CHOOSER_ACTION_OPEN,(gtk.STOCK_OPEN,gtk.RESPONSE_OK,gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL))
+        dialog.set_current_folder("~/")
+
+        response = dialog.run()
+        if response == gtk.RESPONSE_OK:
+            filepath = dialog.get_filename()
+            f = open(filepath)
+            wav2_label = self.builder.get_object("wav2_label")
+            wav2_label.set_text(filepath)
+            print f
+            f.close()
+        dialog.destroy()
+
+
+    #helper function
+    #load a waveform from a txt file and returns a waveform  object
+    #def load_waveform(self,filepath):
+    #    f = open(filepath,"r")
+    #    for
+
 
 
 win = Window()
