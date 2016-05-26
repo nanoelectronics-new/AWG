@@ -63,7 +63,9 @@ class Window:
         
         #create a waveform object
         self.wav_obj = Wav.Waveform(waveform_name = 'WAV1', AWG_clock = self.awg_clock, TimeUnits = self.time_units , AmpUnits = self.amp_units)
-  
+
+        self.wav_obj_begin = Wav.Waveform(waveform_name = 'WAV1', AWG_clock = self.awg_clock, TimeUnits = self.time_units , AmpUnits = self.amp_units)
+        self.wav_obj_end = Wav.Waveform(waveform_name = 'WAV1', AWG_clock = self.awg_clock, TimeUnits = self.time_units , AmpUnits = self.amp_units)  
 
 
         #treeview model
@@ -249,7 +251,7 @@ class Window:
         self.awg_clock = float(self.awg_clock_entry.get_text())
         print "AWG Clock set to",self.awg_clock
         self.statusbar.push(self.context_id, "No. of Segments: " + str(self.num_seg) + " | Time Units: " + str(self.time_units) +  " | Amplitude Units: " + str(self.amp_units) + " | AWG Clock: " + str(self.awg_clock) + " | Max. Amplitude: " + str(self.max_amp)) 
-        AWG.set_clock(self.AWG_clock)  # Set AWG clock
+        AWG.set_clock(self.awg_clock)  # Set AWG clock
     
     def on_max_amp_set_clicked(self,button,data=None):
         self.max_amp_entry = self.builder.get_object("max_amp_entry")
@@ -505,6 +507,13 @@ class Window:
 
     def on_awg_upload_clicked(self,button,data=None):
         self.wav_obj.CH4.rescaleAmplitude(self.max_amp)
+        AWG.set_clock(self.awg_clock)  # Set AWG clock
+        AWG.set_ch1_amplitude(self.max_amp)  # Setting maximum needed amp on all AWG channels
+        AWG.set_ch2_amplitude(self.max_amp) 
+        AWG.set_ch3_amplitude(self.max_amp) 
+        AWG.set_ch4_amplitude(self.max_amp) 
+        print "AWG Clock set to",self.awg_clock
+        print "Maximum Amplitude set to",self.max_amp
 
         AWG.send_waveform_object(Wav = self.wav_obj.CH4, path = 'C:\SEQwav\\')
         AWG.import_waveform_object(Wav = self.wav_obj.CH4, path = 'C:\SEQwav\\')
@@ -536,7 +545,7 @@ class Window:
             for i in range(self.num_seg):
                 line = ""
                 for j in range(len(self.treeview_list[0])):
-                    line += str(self.treeview_list[i][j])
+                    line += str(self.treeview_list[i][j]) + " "
                 line += "\n"
                 f.write(line)
             f.close()
@@ -548,11 +557,9 @@ class Window:
         response = dialog.run()
         if response == gtk.RESPONSE_OK:
             filepath = dialog.get_filename()
-            f = open(filepath)
+            self.load_waveform(filepath,self.wav_obj)
             wav_label = self.builder.get_object("load_waveform_label")
-            wav_label.set_text(filepath.split('//')[-1])
-            print f
-            f.close()
+            wav_label.set_text(filepath)
         dialog.destroy()
 
     def on_open_waveform1_clicked(self,widget,data=None):
@@ -586,11 +593,143 @@ class Window:
 
     #helper function
     #load a waveform from a txt file and returns a waveform  object
-    #def load_waveform(self,filepath):
-    #    f = open(filepath,"r")
-    #    for
+    def load_waveform(self,filepath,wav):
+        f = open(filepath,"r")
+        #hard coded
+        #DONT CHANGE 
+        lines = f.readlines()
+        #num_seg
+        self.num_seg = int(lines[0].split()[1])
+        print "Number of segments set to",self.num_seg
+        
+        #time and amp units
+        self.time_units = lines[1].split()[1]
+        self.amp_units = lines[2].split()[1]
+        wav.Change_time_units(self.time_units)
+        wav.Change_amp_units(self.amp_units) 
+        print "Time units set to",self.time_units
+        print "Amplitide units units set to",self.amp_units
+
+        #awg_clock and max_amp
+        self.awg_clock = float(lines[3].split()[1])
+        self.max_amp = float(lines[4].split()[1])
+        #AWG.set_clock(self.awg_clock)  # Set AWG clock
+        #AWG.set_ch1_amplitude(self.max_amp)  # Setting maximum needed amp on all AWG channels
+        #AWG.set_ch2_amplitude(self.max_amp) 
+        #AWG.set_ch3_amplitude(self.max_amp) 
+        #AWG.set_ch4_amplitude(self.max_amp) 
+        #print "AWG Clock set to",self.awg_clock
+        #print "Maximum Amplitude set to",self.max_amp
+        self.statusbar.push(self.context_id, "No. of Segments: " + str(self.num_seg) + " | Time Units: " + str(self.time_units) +  " | Amplitude Units: " + str(self.amp_units) + " | AWG Clock: " + str(self.awg_clock) + " | Max. Amplitude: " + str(self.max_amp)) 
+        self.treeview_list.clear()
+
+        for line in lines[5:]:
+            self.treeview_list.append(line.split())
+
+        self.seg_list_a = []
+        self.seg_list_m1 = []
+        self.seg_list_m2 = []
+        for i in range(self.num_seg):
+            self.seg_list_a += [[float(self.treeview_list[i][1]),float(self.treeview_list[i][2])]]
+            self.set_marker_from_input_m1(i,3)
+            self.set_marker_from_input_m2(i,4)
+
+        wav.setValuesCH1(*self.seg_list_a)
+        wav.setMarkersCH1(self.seg_list_m1,self.seg_list_m2)
+        self.seg_list_a = []
+        self.seg_list_m1 = []
+        self.seg_list_m2 = []
+        for i in range(self.num_seg):
+            self.seg_list_a += [[float(self.treeview_list[i][1]),float(self.treeview_list[i][5])]]
+            self.set_marker_from_input_m1(i,6)
+            self.set_marker_from_input_m2(i,7)
+
+        wav.setValuesCH2(*self.seg_list_a)
+        wav.setMarkersCH2(self.seg_list_m1,self.seg_list_m2)
+
+        self.seg_list_a = []
+        self.seg_list_m1 = []
+        self.seg_list_m2 = []
+        for i in range(self.num_seg):
+            self.seg_list_a += [[float(self.treeview_list[i][1]),float(self.treeview_list[i][8])]]
+            self.set_marker_from_input_m1(i,9)
+            self.set_marker_from_input_m2(i,10)
+        
+        wav.setValuesCH3(*self.seg_list_a)
+        wav.setMarkersCH3(self.seg_list_m1,self.seg_list_m2)
+        self.seg_list_a = []
+        self.seg_list_m1 = []
+        self.seg_list_m2 = []
+        for i in range(self.num_seg):
+            self.seg_list_a += [[float(self.treeview_list[i][1]),float(self.treeview_list[i][11])]]
+            self.set_marker_from_input_m1(i,12)
+            self.set_marker_from_input_m2(i,13)
+          
+        wav.setValuesCH4(*self.seg_list_a)
+        wav.setMarkersCH4(self.seg_list_m1,self.seg_list_m2)
+   
+    def on_open_waveform1_clicked(self,widget,data=None):
+        dialog = gtk.FileChooserDialog("Open waveform",self.window,gtk.FILE_CHOOSER_ACTION_OPEN,(gtk.STOCK_OPEN,gtk.RESPONSE_OK,gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL))
+        dialog.set_current_folder("~/")
+
+        response = dialog.run()
+        if response == gtk.RESPONSE_OK:
+            filepath = dialog.get_filename()
+            self.load_waveform(filepath,self.wav_obj_begin)
+            wav_label = self.builder.get_object("wav1_label")
+            wav_label.set_text(filepath)
+        dialog.destroy()
+
+    def on_open_waveform2_clicked(self,widget,data=None):
+        dialog = gtk.FileChooserDialog("Open waveform",self.window,gtk.FILE_CHOOSER_ACTION_OPEN,(gtk.STOCK_OPEN,gtk.RESPONSE_OK,gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL))
+        dialog.set_current_folder("~/")
+
+        response = dialog.run()
+        if response == gtk.RESPONSE_OK:
+            filepath = dialog.get_filename()
+            self.load_waveform(filepath,self.wav_obj_end)
+            wav_label = self.builder.get_object("wav2_label")
+            wav_label.set_text(filepath)
+        dialog.destroy()
+    def on_gen_seq_clicked(self,button,data=None):
+        seq = self.wav_obj_begin.interpolate_to(10,self.wav_obj_end)
+       
+        for ch_num in xrange(len(seq)):
+            for seq_elem in seq[ch_num]:
+                #decide what max_amp to use
+                seq_elem.rescaleAmplitude(self.max_amp)
+                AWG.send_waveform_object(Wav = seq_elem, path = 'C:\SEQwav\\')
+                AWG.import_waveform_object(Wav = seq_elem, path = 'C:\SEQwav\\')
+
+         ## SET AWG
+        AWG.set_sequence_mode_on()  # Tell the device to run in sequence mode (run_mode_sequence)
+        AWG.set_seq_length(0)   # Clear all elements of existing sequence   
+        AWG.set_seq_length(10)  # Set wanted sequence length
+        for ch in xrange(len(seq)):   # Iterating trough channels
+
+            
+            if 'CH1' in seq[ch][0].waveform_name:   # Checking to which channel sequence elements needs to be uploaded
+                channel = 1                         # by checking the name of first element dedicated to specified channel
+            elif 'CH2' in seq[ch][0].waveform_name:
+                channel = 2
+            elif 'CH3' in seq[ch][0].waveform_name:
+                channel = 3
+            elif 'CH4' in seq[ch][0].waveform_name:
+                channel = 4
+
+            for elem_num, seq_elem in enumerate(seq[ch]):   # Iterating trough sequence elements
+                
+                #if elem_num == 0: # If it is the FIRST element set TWAIT = 1 - wait for trigger
+                    #AWG.load_seq_elem(elem_num+1,channel, seq_elem.waveform_name, TWAIT = 1)
 
 
+                
+
+                if elem_num == (len(seq[ch])-1): # If it is the last element set GOTOind=1 - return to first elem
+                    AWG.load_seq_elem(elem_num+1,channel, seq_elem.waveform_name, GOTOind=1)
+                    
+                else:
+                    AWG.load_seq_elem(elem_num+1,channel, seq_elem.waveform_name)
 
 win = Window()
 gtk.main()

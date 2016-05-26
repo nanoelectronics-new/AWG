@@ -136,6 +136,7 @@
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">True</property>
+                        <signal name="clicked" handler="on_num_seg_set_clicked" swapped="no"/>
                       </object>
                       <packing>
                         <property name="left_attach">2</property>
@@ -224,6 +225,7 @@
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">True</property>
+                        <signal name="clicked" handler="on_awg_clock_set_clicked" swapped="no"/>
                       </object>
                       <packing>
                         <property name="left_attach">2</property>
@@ -239,6 +241,7 @@
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">True</property>
+                        <signal name="clicked" handler="on_max_amp_set_clicked" swapped="no"/>
                       </object>
                       <packing>
                         <property name="left_attach">2</property>
@@ -283,18 +286,6 @@
                       </packing>
                     </child>
                     <child>
-                      <placeholder/>
-                    </child>
-                    <child>
-                      <placeholder/>
-                    </child>
-                    <child>
-                      <placeholder/>
-                    </child>
-                    <child>
-                      <placeholder/>
-                    </child>
-                    <child>
                       <object class="GtkHSeparator" id="hseparator2">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
@@ -328,9 +319,21 @@
                         <property name="bottom_attach">2</property>
                       </packing>
                     </child>
+                    <child>
+                      <placeholder/>
+                    </child>
+                    <child>
+                      <placeholder/>
+                    </child>
+                    <child>
+                      <placeholder/>
+                    </child>
+                    <child>
+                      <placeholder/>
+                    </child>
                   </object>
                   <packing>
-                    <property name="expand">False</property>
+                    <property name="expand">True</property>
                     <property name="fill">True</property>
                     <property name="position">0</property>
                   </packing>
@@ -423,12 +426,13 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkButton" id="plot5">
+                          <object class="GtkButton" id="plot1">
                             <property name="label" translatable="yes">Plot</property>
                             <property name="use_action_appearance">False</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
+                            <signal name="clicked" handler="on_plot1_clicked" swapped="no"/>
                           </object>
                           <packing>
                             <property name="left_attach">1</property>
@@ -438,12 +442,13 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkButton" id="plot6">
+                          <object class="GtkButton" id="plot2">
                             <property name="label" translatable="yes">Plot</property>
                             <property name="use_action_appearance">False</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
+                            <signal name="clicked" handler="on_plot2_clicked" swapped="no"/>
                           </object>
                           <packing>
                             <property name="left_attach">1</property>
@@ -453,12 +458,13 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkButton" id="plot7">
+                          <object class="GtkButton" id="plot3">
                             <property name="label" translatable="yes">Plot</property>
                             <property name="use_action_appearance">False</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
+                            <signal name="clicked" handler="on_plot3_clicked" swapped="no"/>
                           </object>
                           <packing>
                             <property name="left_attach">1</property>
@@ -468,12 +474,13 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkButton" id="plot8">
+                          <object class="GtkButton" id="plot4">
                             <property name="label" translatable="yes">Plot</property>
                             <property name="use_action_appearance">False</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
+                            <signal name="clicked" handler="on_plot4_clicked" swapped="no"/>
                           </object>
                           <packing>
                             <property name="left_attach">1</property>
@@ -499,9 +506,10 @@
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">True</property>
+                        <signal name="clicked" handler="on_awg_upload_clicked" swapped="no"/>
                       </object>
                       <packing>
-                        <property name="expand">True</property>
+                        <property name="expand">False</property>
                         <property name="fill">True</property>
                         <property name="position">1</property>
                       </packing>
@@ -564,7 +572,7 @@
               <object class="GtkTable" id="table1">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="n_rows">3</property>
+                <property name="n_rows">4</property>
                 <property name="n_columns">2</property>
                 <property name="homogeneous">True</property>
                 <child>
@@ -596,16 +604,17 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkButton" id="button3">
+                  <object class="GtkButton" id="gen_seq">
                     <property name="label" translatable="yes">Generate Sequence</property>
                     <property name="use_action_appearance">False</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
+                    <signal name="clicked" handler="on_gen_seq_clicked" swapped="no"/>
                   </object>
                   <packing>
-                    <property name="top_attach">2</property>
-                    <property name="bottom_attach">3</property>
+                    <property name="top_attach">3</property>
+                    <property name="bottom_attach">4</property>
                     <property name="y_options">GTK_EXPAND</property>
                   </packing>
                 </child>
@@ -620,8 +629,8 @@
                   <packing>
                     <property name="left_attach">1</property>
                     <property name="right_attach">2</property>
-                    <property name="top_attach">2</property>
-                    <property name="bottom_attach">3</property>
+                    <property name="top_attach">3</property>
+                    <property name="bottom_attach">4</property>
                     <property name="y_options">GTK_EXPAND</property>
                   </packing>
                 </child>
@@ -649,6 +658,37 @@
                     <property name="top_attach">1</property>
                     <property name="bottom_attach">2</property>
                     <property name="y_options">GTK_EXPAND</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkEntry" id="num_ele_entry">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="invisible_char">●</property>
+                    <property name="primary_icon_activatable">False</property>
+                    <property name="secondary_icon_activatable">False</property>
+                    <property name="primary_icon_sensitive">True</property>
+                    <property name="secondary_icon_sensitive">True</property>
+                  </object>
+                  <packing>
+                    <property name="top_attach">2</property>
+                    <property name="bottom_attach">3</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkButton" id="set_num_ele">
+                    <property name="label" translatable="yes">Set number of elements</property>
+                    <property name="use_action_appearance">False</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">True</property>
+                    <signal name="clicked" handler="on_set_num_ele_clicked" swapped="no"/>
+                  </object>
+                  <packing>
+                    <property name="left_attach">1</property>
+                    <property name="right_attach">2</property>
+                    <property name="top_attach">2</property>
+                    <property name="bottom_attach">3</property>
                   </packing>
                 </child>
               </object>
