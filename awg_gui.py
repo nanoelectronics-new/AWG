@@ -59,10 +59,10 @@ class Window:
    
         
         AWG.del_waveform_all()  # Clear all waveforms in waveform list
-        AWG.set_clock(self.AWG_clock)  # Set AWG clock
+        AWG.set_clock(self.awg_clock)  # Set AWG clock
         
         #create a waveform object
-        self.wav_obj = Wav.Waveform(waveform_name = 'WAV1', AWG_clock = self.AWG_clock, TimeUnits = self.time_units , AmpUnits = self.amp_units)
+        self.wav_obj = Wav.Waveform(waveform_name = 'WAV1', AWG_clock = self.awg_clock, TimeUnits = self.time_units , AmpUnits = self.amp_units)
   
 
 
