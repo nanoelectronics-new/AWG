@@ -504,7 +504,7 @@ class Window:
         plt.show()
 
     def on_awg_upload_clicked(self,button,data=None):
-        self.wav_obj.CH4.rescaleAmplitude(self.AWGMax_amp)
+        self.wav_obj.CH4.rescaleAmplitude(self.max_amp)
 
         AWG.send_waveform_object(Wav = self.wav_obj.CH4, path = 'C:\SEQwav\\')
         AWG.import_waveform_object(Wav = self.wav_obj.CH4, path = 'C:\SEQwav\\')
