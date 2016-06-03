@@ -37,7 +37,21 @@ class Window:
         self.amp_units = "mV"
         self.awg_clock = 1e8
         self.max_amp = 1   # Maximum amplitude in Volts
+        #the hard variables denote the ones that go on the hardware, the non-hard variables are used in the waveform object
+        self.awg_clock_hard = 1e8
+        self.max_amp_hard = 1   # Maximum amplitude in Volts
+        self.num_ele = 10   #number of elements in a sequence
+
+        #run/stop for AWG
+        #False : Not running
+        self.awg_state = False
+        self.runmode = "SEQ"
         
+        #channel status
+        #self.ch1_status = AWG.get_ch1_status()
+        #self.ch2_status = AWG.get_ch2_status()
+        #self.ch3_status = AWG.get_ch3_status()
+        #self.ch4_status = AWG.get_ch4_status()
         #gui initialization from the glade file
         self.gladefile = "awg_gui.glade"
         self.builder = gtk.Builder()
@@ -52,14 +66,15 @@ class Window:
         self.builder.connect_signals(self)
 
 
-        AWG.set_ch1_amplitude(self.max_amp)  # Setting maximum needed amp on all AWG channels
-        AWG.set_ch2_amplitude(self.max_amp) 
-        AWG.set_ch3_amplitude(self.max_amp) 
-        AWG.set_ch4_amplitude(self.max_amp) 
+        AWG.set_ch1_amplitude(self.max_amp_hard)  # Setting maximum needed amp on all AWG channels
+        AWG.set_ch2_amplitude(self.max_amp_hard) 
+        AWG.set_ch3_amplitude(self.max_amp_hard) 
+        AWG.set_ch4_amplitude(self.max_amp_hard) 
    
         
         AWG.del_waveform_all()  # Clear all waveforms in waveform list
-        AWG.set_clock(self.awg_clock)  # Set AWG clock
+        AWG.set_clock(self.awg_clock_hard)  # Set AWG clock
+        AWG.set_runmode(self.runmode)
         
         #create a waveform object
         self.wav_obj = Wav.Waveform(waveform_name = 'WAV1', AWG_clock = self.awg_clock, TimeUnits = self.time_units , AmpUnits = self.amp_units)
@@ -198,6 +213,12 @@ class Window:
         self.amp_units_list.append([1,"mV"])
         self.amp_units_list.append([2,"uV"])
 
+        self.runmode_list = gtk.ListStore(int,str)
+        self.runmode_list.append([0,"TRIG"])
+        self.runmode_list.append([0,"CONT"])
+        self.runmode_list.append([0,"SEQ"])
+        self.runmode_list.append([0,"GATE"])
+
         #initialization of the comboboxes for time and amplitude units
         self.time_units_box = self.builder.get_object("time_units_box")
         self.time_units_box.set_model(self.time_units_list)
@@ -212,8 +233,51 @@ class Window:
         self.amp_units_box.add_attribute(self.cell, 'text', 1)
         self.amp_units_box.set_active(1)
 
+        self.runmode_box = self.builder.get_object('runmode_box')
+        self.runmode_box.set_model(self.runmode_list)
+        self.runmode_box.pack_start(self.cell,True)
+        self.runmode_box.add_attribute(self.cell,'text',1)
+        self.runmode_box.set_active(2)
+
         self.statusbar.push(self.context_id, "No. of Segments: " + str(self.num_seg) + " | Time Units: " + str(self.time_units) +  " | Amplitude Units: " + str(self.amp_units) + " | AWG Clock: " + str(self.awg_clock) + " | Max. Amplitude: " + str(self.max_amp)) 
 
+    def set_channel_status(self,status="off",channel=1):
+        #the default is off for security
+        if channel == 1:
+            AWG.set_ch1_status(status)
+        label = self.builder.get_object('ch' + str(channel) + '_status_label')
+        toggle_button = self.builder.get_object('ch' + str(channel) + '_status_button')
+        if(status.upper() == "OFF"):
+            label.set_markup("<span background='#808080'>Channel " + str(channel) + "</span>")
+            #toggle_button.set_active(False)
+        else:
+            label.set_markup("<span background='#00FF00'>Channel " + str(channel) + "</span>")
+            #toggle_button.set_active(True)
+
+    def on_ch1_status_button_toggled(self,button,data=None):
+        toggle_button = self.builder.get_object('ch1_status_button')
+        if toggle_button.get_active() == True:
+            self.set_channel_status("ON",1)
+        else:
+            self.set_channel_status("OFF",1)
+    def on_ch2_status_button_toggled(self,button,data=None):
+        toggle_button = self.builder.get_object('ch2_status_button')
+        if toggle_button.get_active() == True:
+            self.set_channel_status("ON",2)
+        else:
+            self.set_channel_status("OFF",2)
+    def on_ch3_status_button_toggled(self,button,data=None):
+        toggle_button = self.builder.get_object('ch3_status_button')
+        if toggle_button.get_active() == True:
+            self.set_channel_status("ON",3)
+        else:
+            self.set_channel_status("OFF",3)
+    def on_ch4_status_button_toggled(self,button,data=None):
+        toggle_button = self.builder.get_object('ch4_status_button')
+        if toggle_button.get_active() == True:
+            self.set_channel_status("ON",4)
+        else:
+            self.set_channel_status("OFF",4)
 
     def on_window1_destroy(self, object, data=None):
         print "AWG GUI quit with cancel button."
@@ -229,18 +293,18 @@ class Window:
             self.treeview_list.append([i+1] + self.default_treeview_list)
 
     def on_time_units_box_changed(self,widget,data=None):
-        self.index = widget.get_active()
-        self.model = widget.get_model()
-        self.time_units = self.model[self.index][1]
+        index = widget.get_active()
+        model = widget.get_model()
+        self.time_units = model[index][1]
         print "Time units set to",self.time_units
         self.statusbar.push(self.context_id, "No. of Segments: " + str(self.num_seg) + " | Time Units: " + str(self.time_units) +  " | Amplitude Units: " + str(self.amp_units) + " | AWG Clock: " + str(self.awg_clock) + " | Max. Amplitude: " + str(self.max_amp)) 
         self.wav_obj.Change_time_units(self.time_units)
        
 
     def on_amp_units_box_changed(self,widget,data=None):
-        self.index = widget.get_active()
-        self.model = widget.get_model()
-        self.amp_units = self.model[self.index][1]
+        index = widget.get_active()
+        model = widget.get_model()
+        self.amp_units = model[index][1]
         print "Amplitide units units set to",self.amp_units
         self.statusbar.push(self.context_id, "No. of Segments: " + str(self.num_seg) + " | Time Units: " + str(self.time_units) +  " | Amplitude Units: " + str(self.amp_units) + " | AWG Clock: " + str(self.awg_clock) + " | Max. Amplitude: " + str(self.max_amp)) 
         self.wav_obj.Change_amp_units(self.amp_units) 
@@ -249,23 +313,38 @@ class Window:
     def on_awg_clock_set_clicked(self,button,data=None):
         self.awg_clock_entry = self.builder.get_object("awg_clock_entry")
         self.awg_clock = float(self.awg_clock_entry.get_text())
-        print "AWG Clock set to",self.awg_clock
+        #print "AWG Clock set to",self.awg_clock
         self.statusbar.push(self.context_id, "No. of Segments: " + str(self.num_seg) + " | Time Units: " + str(self.time_units) +  " | Amplitude Units: " + str(self.amp_units) + " | AWG Clock: " + str(self.awg_clock) + " | Max. Amplitude: " + str(self.max_amp)) 
-        AWG.set_clock(self.awg_clock)  # Set AWG clock
+        #only the set hard buttons change on the hardware
+        #AWG.set_clock(self.awg_clock)  # Set AWG clock
     
     def on_max_amp_set_clicked(self,button,data=None):
         self.max_amp_entry = self.builder.get_object("max_amp_entry")
         self.max_amp = float(self.max_amp_entry.get_text())
-        print "Maximum Amplitude set to",self.max_amp
+        #print "Maximum Amplitude set to",self.max_amp
         self.statusbar.push(self.context_id, "No. of Segments: " + str(self.num_seg) + " | Time Units: " + str(self.time_units) +  " | Amplitude Units: " + str(self.amp_units) + " | AWG Clock: " + str(self.awg_clock) + " | Max. Amplitude: " + str(self.max_amp)) 
-        AWG.set_ch1_amplitude(self.max_amp)  # Setting maximum needed amp on all AWG channels
-        AWG.set_ch2_amplitude(self.max_amp) 
-        AWG.set_ch3_amplitude(self.max_amp) 
-        AWG.set_ch4_amplitude(self.max_amp) 
         
-
+        #only the set hard buttons change on the hardware
+        #AWG.set_ch1_amplitude(self.max_amp)  # Setting maximum needed amp on all AWG channels
+        #AWG.set_ch2_amplitude(self.max_amp) 
+        #AWG.set_ch3_amplitude(self.max_amp) 
+        #AWG.set_ch4_amplitude(self.max_amp) 
         
+    def on_awg_clock_set_hard_clicked(self,button,data=None):
+        self.awg_clock_entry_hard = self.builder.get_object("awg_clock_entry_hard")
+        self.awg_clock_hard = float(self.awg_clock_entry_hard.get_text())
+        print "AWG Clock set to",self.awg_clock_hard
+        AWG.set_clock(self.awg_clock_hard)  # Set AWG clock
     
+    def on_max_amp_set_hard_clicked(self,button,data=None):
+        self.max_amp_entry_hard = self.builder.get_object("max_amp_entry_hard")
+        self.max_amp_hard = float(self.max_amp_entry_hard.get_text())
+        print "Maximum Amplitude set to",self.max_amp_hard
+        AWG.set_ch1_amplitude(self.max_amp_hard)  # Setting maximum needed amp on all AWG channels
+        AWG.set_ch2_amplitude(self.max_amp_hard) 
+        AWG.set_ch3_amplitude(self.max_amp_hard) 
+        AWG.set_ch4_amplitude(self.max_amp_hard) 
+
     def set_marker_from_input_m1(self,i,index):
         #i is the segment index along column
         #index is index along the row
@@ -592,7 +671,7 @@ class Window:
 
 
     #helper function
-    #load a waveform from a txt file and returns a waveform  object
+    #load a waveform from a txt file and stores the data in wav
     def load_waveform(self,filepath,wav):
         f = open(filepath,"r")
         #hard coded
@@ -613,13 +692,7 @@ class Window:
         #awg_clock and max_amp
         self.awg_clock = float(lines[3].split()[1])
         self.max_amp = float(lines[4].split()[1])
-        #AWG.set_clock(self.awg_clock)  # Set AWG clock
-        #AWG.set_ch1_amplitude(self.max_amp)  # Setting maximum needed amp on all AWG channels
-        #AWG.set_ch2_amplitude(self.max_amp) 
-        #AWG.set_ch3_amplitude(self.max_amp) 
-        #AWG.set_ch4_amplitude(self.max_amp) 
-        #print "AWG Clock set to",self.awg_clock
-        #print "Maximum Amplitude set to",self.max_amp
+
         self.statusbar.push(self.context_id, "No. of Segments: " + str(self.num_seg) + " | Time Units: " + str(self.time_units) +  " | Amplitude Units: " + str(self.amp_units) + " | AWG Clock: " + str(self.awg_clock) + " | Max. Amplitude: " + str(self.max_amp)) 
         self.treeview_list.clear()
 
@@ -667,7 +740,7 @@ class Window:
           
         wav.setValuesCH4(*self.seg_list_a)
         wav.setMarkersCH4(self.seg_list_m1,self.seg_list_m2)
-   
+    
     def on_open_waveform1_clicked(self,widget,data=None):
         dialog = gtk.FileChooserDialog("Open waveform",self.window,gtk.FILE_CHOOSER_ACTION_OPEN,(gtk.STOCK_OPEN,gtk.RESPONSE_OK,gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL))
         dialog.set_current_folder("~/")
@@ -692,7 +765,7 @@ class Window:
             wav_label.set_text(filepath)
         dialog.destroy()
     def on_gen_seq_clicked(self,button,data=None):
-        seq = self.wav_obj_begin.interpolate_to(10,self.wav_obj_end)
+        seq = self.wav_obj_begin.interpolate_to(self.num_ele,self.wav_obj_end)
        
         for ch_num in xrange(len(seq)):
             for seq_elem in seq[ch_num]:
@@ -704,7 +777,7 @@ class Window:
          ## SET AWG
         AWG.set_sequence_mode_on()  # Tell the device to run in sequence mode (run_mode_sequence)
         AWG.set_seq_length(0)   # Clear all elements of existing sequence   
-        AWG.set_seq_length(10)  # Set wanted sequence length
+        AWG.set_seq_length(self.num_ele)  # Set wanted sequence length
         for ch in xrange(len(seq)):   # Iterating trough channels
 
             
@@ -730,7 +803,31 @@ class Window:
                     
                 else:
                     AWG.load_seq_elem(elem_num+1,channel, seq_elem.waveform_name)
+    
+    def on_set_num_ele_clicked(self,button,data=None):
+        self.num_ele_entry = self.builder.get_object('num_ele_entry')
+        self.num_ele = int(self.num_ele_entry.get_text())
+        print "Number of elements in sequence set to",self.num_ele 
 
+    def on_awg_run_hard_toggled(self,button,data=None):
+        if(self.awg_state == False):
+            AWG.run()
+            print "AWG on."
+            self.awg_state = True
+            button.set_label('Stop')
+        else:
+            AWG.stop()
+            print "AWG off."
+            self.awg_state = False
+            button.set_label('Run')
+
+    def on_set_awg_runmode_hard_clicked(self,button,data=None):
+        index = self.runmode_box.get_active()
+        model = self.runmode_box.get_model()
+        self.awg_runmode = model[index][1]
+        
+        AWG.set_runmode(self.awg_runmode)
+        print "AWG Runmode set to",self.runmode
 win = Window()
 gtk.main()
-        
+         
