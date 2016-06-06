@@ -1,7 +1,11 @@
 import Waveform_PresetAmp as Wav
+import AWG_lib
 #import Tektronix_AWG5014 as AWG
 
-AWG_clock = 1.1e8
+AWG_clock = 1e6
+AWGMax_amp = 2
+Seq_length = 5
+
 #AWG = AWG.Tektronix_AWG5014('AWG','140.78.89.158')
 
 p1 = Wav.Waveform(waveform_name = 'WAV1', AWG_clock = AWG_clock, TimeUnits = 'ms' , AmpUnits = 'mV')  # Generating starting wavefrom
@@ -10,7 +14,7 @@ p1.setValuesCH1([5,100], [5, 0], [5, 100]) # Tu napraviti da se proslijeduje lis
 #p1.setValuesCH2([10,50], [5, 300, 200],[10, 100])
 #p1.setValuesCH3([10,50], [5, 300, 200],[10, 100])
 #p1.setValuesCH4([10,50], [5, 300, 200],[10, 100])
-p1.setMarkersCH1([0.0,0.0,0.0],[0.0,0.0,0.0])
+p1.setMarkersCH1([1,0,0],[1,0,0])
 #p1.setMArkersCH2([1,1,0],[0,0,1])
 #p1.setMArkersCH3([1,1,0],[0,1,1])
 #p1.setMArkersCH4([1,1,0],[0,1,1])
@@ -22,12 +26,15 @@ p2.setValuesCH1([5,100], [5, 0], [5, 100])
 #p2.setValuesCH2([20,20], [10, 100, 300],[5, -100])
 #p2.setValuesCH3([20,500], [10, 200, 300],[5, 100])
 #p2.setValuesCH4([20,40], [10, -300, -200],[5, -100])
-#p2.setMarkersCH1([0,0,0],[0,0,0])
+p2.setMarkersCH1([1,0,0],[1,0,0])
 #p2.setMArkersCH2([1,1,0],[0,0,1])
 #p2.setMArkersCH3([1,1,0],[0,1,1])
 #p2.setMArkersCH4([1,1,0],[0,1,1])
 
-seq = p1.interpolate_to(5,p2)   # Creating sequence
+seq = p1.interpolate_to(Seq_length,p2)   # Creating sequence
+
+AWG_lib.set_waveform(seq,AWG_clock,AWGMax_amp,Seq_length)
+
 
 
 

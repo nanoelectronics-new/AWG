@@ -2,7 +2,7 @@
 
 
 import Tektronix_AWG5014 as ArbWG
-import InverseHPfilterSeq as INV   # ADDED
+#import InverseHPfilterSeq as INV   # ADDED
 import matplotlib.pyplot as plt
 import qt
 import re
@@ -19,7 +19,7 @@ if 'AWG' in locals():
     AWG._ins._visainstrument.close()   # Trying to close previous AWG session. 
 
        
-AWG = qt.instruments.create('AWG', 'Tektronix_AWG5014', address='169.254.111.236')  # Changed
+AWG = qt.instruments.create('AWG', 'Tektronix_AWG5014', address='10.21.64.191')  # Changed
 
 
 

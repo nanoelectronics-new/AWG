@@ -44,6 +44,9 @@ class Window:
 
         #default run mode for AWG
         self.runmode = "SEQ"
+
+        #temporary variable to store the max_amp during sequence generation
+        self.max_amp_tmp = 1
         
         #channel status
         self.ch1_status = AWG.get_ch1_status()
@@ -713,7 +716,7 @@ class Window:
         #awg_clock and max_amp
         self.awg_clock = float(lines[3].split()[1])
         self.max_amp = float(lines[4].split()[1])
-
+        self.max_amp_tmp = float(lines[4].split()[1])
         #change the AWG_clock in the waveform object which determines the number of points
         wav.setAWG_clock(self.awg_clock)
 
@@ -790,11 +793,22 @@ class Window:
         dialog.destroy()
     def on_gen_seq_clicked(self,button,data=None):
         seq = self.wav_obj_begin.interpolate_to(self.num_ele,self.wav_obj_end)
-       
+
+        #the AWG clock and max amp are derived from the last waveform loaded, i.e. the end waveform generally
+        AWG.set_clock(self.wav_obj_end.AWG_clock)
+        self.awg_clock_hard = AWG.get_clock()
+        self.max_amp_hard = self.max_amp_tmp
+        
+
+        AWG.set_ch1_amplitude(self.max_amp_hard)  # Setting maximum needed amp on all AWG channels
+        AWG.set_ch2_amplitude(self.max_amp_hard) 
+        AWG.set_ch3_amplitude(self.max_amp_hard) 
+        AWG.set_ch4_amplitude(self.max_amp_hard) 
+           
         for ch_num in xrange(len(seq)):
             for seq_elem in seq[ch_num]:
                 #decide what max_amp to use
-                seq_elem.rescaleAmplitude(self.max_amp)
+                seq_elem.rescaleAmplitude(self.max_amp_hard)
                 AWG.send_waveform_object(Wav = seq_elem, path = 'C:\SEQwav\\')
                 AWG.import_waveform_object(Wav = seq_elem, path = 'C:\SEQwav\\')
 
@@ -827,6 +841,10 @@ class Window:
                     
                 else:
                     AWG.load_seq_elem(elem_num+1,channel, seq_elem.waveform_name)
+        
+
+        label = self.builder.get_object("awg_settings_label")
+        label.set_text("AWG Settings \n\n" + "AWG Clock : " + str(self.awg_clock_hard/1e6) + " MHz\n" + "Maximum Amplitude : " + str(self.max_amp_hard) + " V\n" + "Run Mode : " + str(self.runmode) + "\n")
     
     def on_set_num_ele_clicked(self,button,data=None):
         self.num_ele_entry = self.builder.get_object('num_ele_entry')
