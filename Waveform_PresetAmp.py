@@ -53,8 +53,10 @@ class Pulse():
         
         self.waveform_name = waveform_name
         #self.Max_amp = 0
-        
-        
+    def setAWG_clock(self,AWG_clock=1e8):
+        self.AWG_clock = AWG_clock;
+        self.AWG_period = 1/float(self.AWG_clock) 
+        self.ModifyWaveform() 
                 
     def setAmplitudes(self, **kwargs):
         '''
@@ -368,12 +370,16 @@ class Waveform():
         self.lengthM = 0
         
         
-        
-        
+    def setAWG_clock(self, AWG_clock=1e8):    
+        self.AWG_clock = AWG_clock
+        self.AWG_period = 1/float(AWG_clock)     # Calculating AWG period
     
-        
-        
-        
+        self.CH1.setAWG_clock(self.AWG_clock)
+        self.CH2.setAWG_clock(self.AWG_clock)
+        self.CH3.setAWG_clock(self.AWG_clock)
+        self.CH4.setAWG_clock(self.AWG_clock)
+
+    
         
     def setValuesCH1(self, *args):    # Izbjegavati *args i *kwargs nego koristiti call specific strukture
         self.setValues(self.CH1,args)

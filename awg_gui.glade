@@ -5,8 +5,8 @@
   <object class="GtkWindow" id="window1">
     <property name="can_focus">False</property>
     <property name="title" translatable="yes">AWG Interface</property>
-    <property name="default_width">800</property>
-    <property name="default_height">600</property>
+    <property name="default_width">1024</property>
+    <property name="default_height">768</property>
     <property name="icon">awg.jpg</property>
     <signal name="destroy" handler="on_window1_destroy" swapped="no"/>
     <child>
@@ -18,14 +18,41 @@
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <child>
-              <object class="GtkLabel" id="label4">
+              <object class="GtkHBox" id="hbox3">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">AWG Settings</property>
+                <child>
+                  <object class="GtkLabel" id="awg_settings_label">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="label" translatable="yes">AWG Settings</property>
+                    <attributes>
+                      <attribute name="style" value="normal"/>
+                      <attribute name="scale" value="1.5"/>
+                    </attributes>
+                  </object>
+                  <packing>
+                    <property name="expand">True</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkImage" id="image1">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="pixbuf">awg.jpg</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
               </object>
               <packing>
-                <property name="expand">True</property>
-                <property name="fill">True</property>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
                 <property name="position">0</property>
               </packing>
             </child>
@@ -178,150 +205,203 @@
                 </child>
               </object>
               <packing>
-                <property name="expand">True</property>
-                <property name="fill">True</property>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
                 <property name="position">2</property>
               </packing>
             </child>
             <child>
-              <object class="GtkTable" id="table5">
+              <object class="GtkHSeparator" id="hseparator6">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="n_rows">4</property>
-                <property name="n_columns">2</property>
-                <child>
-                  <object class="GtkCheckButton" id="ch1_status_button">
-                    <property name="use_action_appearance">False</property>
-                    <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="receives_default">False</property>
-                    <property name="draw_indicator">True</property>
-                    <signal name="toggled" handler="on_ch1_status_button_toggled" swapped="no"/>
-                  </object>
-                  <packing>
-                    <property name="x_options">GTK_EXPAND</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkCheckButton" id="ch2_status_button">
-                    <property name="use_action_appearance">False</property>
-                    <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="receives_default">False</property>
-                    <property name="draw_indicator">True</property>
-                    <signal name="toggled" handler="on_ch2_status_button_toggled" swapped="no"/>
-                  </object>
-                  <packing>
-                    <property name="top_attach">1</property>
-                    <property name="bottom_attach">2</property>
-                    <property name="x_options">GTK_EXPAND</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkCheckButton" id="ch3_status_button">
-                    <property name="use_action_appearance">False</property>
-                    <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="receives_default">False</property>
-                    <property name="draw_indicator">True</property>
-                    <signal name="toggled" handler="on_ch3_status_button_toggled" swapped="no"/>
-                  </object>
-                  <packing>
-                    <property name="top_attach">2</property>
-                    <property name="bottom_attach">3</property>
-                    <property name="x_options">GTK_EXPAND</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkCheckButton" id="ch4_status_button">
-                    <property name="use_action_appearance">False</property>
-                    <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="receives_default">False</property>
-                    <property name="draw_indicator">True</property>
-                    <signal name="toggled" handler="on_ch4_status_button_toggled" swapped="no"/>
-                  </object>
-                  <packing>
-                    <property name="top_attach">3</property>
-                    <property name="bottom_attach">4</property>
-                    <property name="x_options">GTK_EXPAND</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkLabel" id="ch1_status_label">
-                    <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <property name="label" translatable="yes">Channel 1</property>
-                    <property name="use_markup">True</property>
-                  </object>
-                  <packing>
-                    <property name="left_attach">1</property>
-                    <property name="right_attach">2</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkLabel" id="ch2_status_label">
-                    <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <property name="label" translatable="yes">Channel 2</property>
-                    <property name="use_markup">True</property>
-                  </object>
-                  <packing>
-                    <property name="left_attach">1</property>
-                    <property name="right_attach">2</property>
-                    <property name="top_attach">1</property>
-                    <property name="bottom_attach">2</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkLabel" id="ch4_status_label">
-                    <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <property name="label" translatable="yes">Channel 4</property>
-                    <property name="use_markup">True</property>
-                  </object>
-                  <packing>
-                    <property name="left_attach">1</property>
-                    <property name="right_attach">2</property>
-                    <property name="top_attach">3</property>
-                    <property name="bottom_attach">4</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkLabel" id="ch3_status_label">
-                    <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <property name="label" translatable="yes">Channel 3</property>
-                    <property name="use_markup">True</property>
-                  </object>
-                  <packing>
-                    <property name="left_attach">1</property>
-                    <property name="right_attach">2</property>
-                    <property name="top_attach">2</property>
-                    <property name="bottom_attach">3</property>
-                  </packing>
-                </child>
               </object>
               <packing>
-                <property name="expand">True</property>
+                <property name="expand">False</property>
                 <property name="fill">True</property>
                 <property name="position">3</property>
               </packing>
             </child>
             <child>
-              <object class="GtkToggleButton" id="awg_run_hard">
-                <property name="label" translatable="yes">Run</property>
-                <property name="use_action_appearance">False</property>
+              <object class="GtkHBox" id="hbox2">
                 <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <signal name="toggled" handler="on_awg_run_hard_toggled" swapped="no"/>
+                <property name="can_focus">False</property>
+                <child>
+                  <object class="GtkTable" id="table5">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="n_rows">4</property>
+                    <property name="n_columns">2</property>
+                    <child>
+                      <object class="GtkCheckButton" id="ch1_status_button">
+                        <property name="use_action_appearance">False</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">False</property>
+                        <property name="draw_indicator">True</property>
+                        <signal name="toggled" handler="on_ch1_status_button_toggled" swapped="no"/>
+                      </object>
+                      <packing>
+                        <property name="x_options">GTK_EXPAND</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkCheckButton" id="ch2_status_button">
+                        <property name="use_action_appearance">False</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">False</property>
+                        <property name="draw_indicator">True</property>
+                        <signal name="toggled" handler="on_ch2_status_button_toggled" swapped="no"/>
+                      </object>
+                      <packing>
+                        <property name="top_attach">1</property>
+                        <property name="bottom_attach">2</property>
+                        <property name="x_options">GTK_EXPAND</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkCheckButton" id="ch3_status_button">
+                        <property name="use_action_appearance">False</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">False</property>
+                        <property name="draw_indicator">True</property>
+                        <signal name="toggled" handler="on_ch3_status_button_toggled" swapped="no"/>
+                      </object>
+                      <packing>
+                        <property name="top_attach">2</property>
+                        <property name="bottom_attach">3</property>
+                        <property name="x_options">GTK_EXPAND</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkCheckButton" id="ch4_status_button">
+                        <property name="use_action_appearance">False</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">False</property>
+                        <property name="draw_indicator">True</property>
+                        <signal name="toggled" handler="on_ch4_status_button_toggled" swapped="no"/>
+                      </object>
+                      <packing>
+                        <property name="top_attach">3</property>
+                        <property name="bottom_attach">4</property>
+                        <property name="x_options">GTK_EXPAND</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkLabel" id="ch1_status_label">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">Channel 1</property>
+                        <property name="use_markup">True</property>
+                      </object>
+                      <packing>
+                        <property name="left_attach">1</property>
+                        <property name="right_attach">2</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkLabel" id="ch2_status_label">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">Channel 2</property>
+                        <property name="use_markup">True</property>
+                      </object>
+                      <packing>
+                        <property name="left_attach">1</property>
+                        <property name="right_attach">2</property>
+                        <property name="top_attach">1</property>
+                        <property name="bottom_attach">2</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkLabel" id="ch4_status_label">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">Channel 4</property>
+                        <property name="use_markup">True</property>
+                      </object>
+                      <packing>
+                        <property name="left_attach">1</property>
+                        <property name="right_attach">2</property>
+                        <property name="top_attach">3</property>
+                        <property name="bottom_attach">4</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkLabel" id="ch3_status_label">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">Channel 3</property>
+                        <property name="use_markup">True</property>
+                      </object>
+                      <packing>
+                        <property name="left_attach">1</property>
+                        <property name="right_attach">2</property>
+                        <property name="top_attach">2</property>
+                        <property name="bottom_attach">3</property>
+                      </packing>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="expand">True</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkVBox" id="vbox5">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <child>
+                      <object class="GtkButton" id="awg_run_hard">
+                        <property name="label" translatable="yes">Run</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <property name="image_position">bottom</property>
+                        <signal name="clicked" handler="on_awg_run_hard_clicked" swapped="no"/>
+                      </object>
+                      <packing>
+                        <property name="expand">True</property>
+                        <property name="fill">True</property>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkButton" id="awg_stop_hard">
+                        <property name="label" translatable="yes">Stop</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <property name="image_position">right</property>
+                        <signal name="clicked" handler="on_awg_stop_hard_clicked" swapped="no"/>
+                      </object>
+                      <packing>
+                        <property name="expand">True</property>
+                        <property name="fill">True</property>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="expand">True</property>
+                    <property name="fill">True</property>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
               </object>
               <packing>
                 <property name="expand">True</property>
                 <property name="fill">True</property>
                 <property name="position">4</property>
               </packing>
+            </child>
+            <child>
+              <placeholder/>
             </child>
           </object>
         </child>
@@ -819,21 +899,6 @@
                         <property name="expand">True</property>
                         <property name="fill">True</property>
                         <property name="position">0</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkButton" id="awg_upload">
-                        <property name="label" translatable="yes">Upload to AWG</property>
-                        <property name="use_action_appearance">False</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="receives_default">True</property>
-                        <signal name="clicked" handler="on_awg_upload_clicked" swapped="no"/>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">1</property>
                       </packing>
                     </child>
                   </object>
