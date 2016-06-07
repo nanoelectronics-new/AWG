@@ -152,6 +152,7 @@ class Pulse():
         # Converting from selected units to V
         #self.Max_amp = max(self.waveform)         # Saving Max_amp to be able to set the AWG
         self.waveform = self.waveform/AWGMaxAmp     # Scaling
+        self.waveform = self.waveform - np.mean(self.waveform)   # Substracting mean value in order not to heat up the fridge
     
     def InverseHPfilter(self, R,C, F_sample = 10000000, M=None):
         """Filtering on a real signal using inverse FFT
