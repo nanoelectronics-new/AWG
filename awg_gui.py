@@ -376,6 +376,14 @@ class Window:
         else:
             raise Exception('Error in setting markers - input value must be L or H')
 
+    def convert_marker(self,val):
+        if val == 'L':
+            return 0.0
+        elif val == 'H':
+            return 1.0
+        else:
+            raise Exception('Error in setting markers - input value must be L or H')
+    
     def set_marker_from_input_m2(self,i,index):
         #i is the segment index along column
         #index is index along the row
@@ -768,6 +776,75 @@ class Window:
         wav.setValuesCH4(*self.seg_list_a)
         wav.setMarkersCH4(self.seg_list_m1,self.seg_list_m2)
     
+    def load_waveform_seq_gen(self,filepath,wav):
+        f = open(filepath,"r")
+        #hard coded
+        #DONT CHANGE 
+        lines = f.readlines()
+        #num_seg
+        num_seg = int(lines[0].split()[1])
+                #time and amp units
+        time_units = lines[1].split()[1]
+        amp_units = lines[2].split()[1]
+        wav.Change_time_units(time_units)
+        wav.Change_amp_units(amp_units) 
+
+        #awg_clock and max_amp
+        awg_clock = float(lines[3].split()[1])
+        max_amp = float(lines[4].split()[1])
+
+        #change the AWG_clock in the waveform object which determines the number of points
+        wav.setAWG_clock(awg_clock)
+        
+        #max_amp_tmp stores it globally for use in sequence generation
+        self.max_amp_tmp = float(lines[4].split()[1])
+
+        #remove the header
+        lines = lines[5:]
+        seg_list_a = []
+        seg_list_m1 = []
+        seg_list_m2 = []
+        for seg_no in range(num_seg):
+            dat = lines[seg_no].split()
+            seg_list_a += [[float(dat[1]),float(dat[2])]]
+            seg_list_m1 += [self.convert_marker(dat[3])]
+            seg_list_m2 += [self.convert_marker(dat[4])]
+        wav.setValuesCH1(*seg_list_a)
+        wav.setMarkersCH1(seg_list_m1,seg_list_m2)
+
+        seg_list_a = []
+        seg_list_m1 = []
+        seg_list_m2 = []
+        for seg_no in range(num_seg):
+            dat = lines[seg_no].split()
+            seg_list_a += [[float(dat[1]),float(dat[5])]]
+            seg_list_m1 += [self.convert_marker(dat[6])]
+            seg_list_m2 += [self.convert_marker(dat[7])]
+        wav.setValuesCH2(*seg_list_a)
+        wav.setMarkersCH2(seg_list_m1,seg_list_m2)
+
+        seg_list_a = []
+        seg_list_m1 = []
+        seg_list_m2 = []
+        for seg_no in range(num_seg):
+            dat = lines[seg_no].split()
+            seg_list_a += [[float(dat[1]),float(dat[8])]]
+            seg_list_m1 += [self.convert_marker(dat[9])]
+            seg_list_m2 += [self.convert_marker(dat[10])]
+        wav.setValuesCH3(*seg_list_a)
+        wav.setMarkersCH3(seg_list_m1,seg_list_m2)
+
+        seg_list_a = []
+        seg_list_m1 = []
+        seg_list_m2 = []
+        for seg_no in range(num_seg):
+            dat = lines[seg_no].split()
+            seg_list_a += [[float(dat[1]),float(dat[11])]]
+            seg_list_m1 += [self.convert_marker(dat[12])]
+            seg_list_m2 += [self.convert_marker(dat[13])]
+        wav.setValuesCH4(*seg_list_a)
+        wav.setMarkersCH4(seg_list_m1,seg_list_m2)
+
     def on_open_waveform1_clicked(self,widget,data=None):
         dialog = gtk.FileChooserDialog("Open waveform",self.window,gtk.FILE_CHOOSER_ACTION_OPEN,(gtk.STOCK_OPEN,gtk.RESPONSE_OK,gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL))
         dialog.set_current_folder("~/")
@@ -775,7 +852,7 @@ class Window:
         response = dialog.run()
         if response == gtk.RESPONSE_OK:
             filepath = dialog.get_filename()
-            self.load_waveform(filepath,self.wav_obj_begin)
+            self.load_waveform_seq_gen(filepath,self.wav_obj_begin)
             wav_label = self.builder.get_object("wav1_label")
             wav_label.set_text(filepath)
         dialog.destroy()
@@ -787,7 +864,7 @@ class Window:
         response = dialog.run()
         if response == gtk.RESPONSE_OK:
             filepath = dialog.get_filename()
-            self.load_waveform(filepath,self.wav_obj_end)
+            self.load_waveform_seq_gen(filepath,self.wav_obj_end)
             wav_label = self.builder.get_object("wav2_label")
             wav_label.set_text(filepath)
         dialog.destroy()
